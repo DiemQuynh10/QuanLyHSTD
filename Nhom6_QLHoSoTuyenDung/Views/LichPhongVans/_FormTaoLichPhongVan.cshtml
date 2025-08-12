@@ -1,0 +1,93 @@
+﻿@model TaoLichPhongVanVM
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Nhom6_QLHoSoTuyenDung.Models.ViewModels.PhongVanVM
+
+<form id="formTaoLich" method="post" asp-controller="LichPhongVans" asp-action="CreateLichFromPopup">
+    <input type="hidden" asp-for="UngVienId" />
+    <input type="hidden" asp-for="ViTriId" />
+
+    <!-- Chọn hoặc tìm kiếm ứng viên -->
+    <div class="row">
+        <div class="col-md-8 mb-3">
+            <label class="form-label fw-bold">Tìm kiếm ứng viên</label>
+            <select id="ungVienSelect2" name="UngVienId" class="form-select w-100" required>
+                <option></option>
+            </select>
+            <div class="form-text text-muted">Tìm theo tên hoặc email (ứng viên chưa có lịch)</div>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Vị trí ứng tuyển</label>
+        <input id="tenViTriDisplay" class="form-control" value="@Model.TenViTri" readonly />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PhongPhongVanId" class="form-label fw-bold">Phòng phỏng vấn</label>
+        <select asp-for="PhongPhongVanId" asp-items="Model.PhongList" class="form-select" required>
+            <option value="">-- Chọn phòng --</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ThoiGian" class="form-label fw-bold">Thời gian</label>
+        <input asp-for="ThoiGian" class="form-control" type="datetime-local" required />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="NguoiPhongVanIds" class="form-label fw-bold">Người phỏng vấn</label>
+        <select asp-for="NguoiPhongVanIds" asp-items="Model.NguoiPhongVanOptions" class="form-select" multiple required>
+        </select>
+        <small class="text-muted">Giữ Ctrl (Windows) hoặc Cmd (Mac) để chọn nhiều người</small>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="GhiChu" class="form-label fw-bold">Ghi chú (nếu có)</label>
+        <textarea asp-for="GhiChu" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="d-flex justify-content-end mt-3">
+        <button type="submit" class="btn btn-primary">Lưu lịch</button>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        // ⚠️ CHỈ GỌI TỪ INDEX KHI FORM ĐÃ LOAD
+        function initSelect2UngVien() {
+            const select = $('#ungVienSelect2');
+            if (select.length === 0) return;
+
+            select.select2({
+                placeholder: 'Tìm theo tên hoặc email',
+                allowClear: true,
+                minimumInputLength: 1,
+                ajax: {
+                    url: '/LichPhongVans/TimUngVienSelect2',
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return { tuKhoa: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data };
+                    }
+                },
+                dropdownParent: $('#taoLichModal')
+            });
+
+            select.on('select2:select', function (e) {
+                const data = e.params.data;
+                $("input[name='UngVienId']").val(data.id);
+                $('#tenViTriDisplay').val(data.viTri || '');
+            });
+
+            $('#ungVienThuCong').on('change', function () {
+                const id = $(this).val();
+                const text = $(this).find('option:selected').text();
+                const newOption = new Option(text, id, true, true);
+                $('#ungVienSelect2').append(newOption).trigger('change');
+            });
+        }
+    </script>
+}

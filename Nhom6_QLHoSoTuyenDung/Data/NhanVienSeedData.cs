@@ -1,4 +1,5 @@
 ﻿using Nhom6_QLHoSoTuyenDung.Models;
+using Nhom6_QLHoSoTuyenDung.Models.Entities;
 
 namespace Nhom6_QLHoSoTuyenDung.Data
 {
@@ -81,6 +82,21 @@ namespace Nhom6_QLHoSoTuyenDung.Data
                     ChucVu = "Trưởng phòng NS", PhongBanId = "PBNS", Email = "dung.truongns@example.com",
                     SoDienThoai = "0901000012", NgayVaoCongTy = new DateTime(2013, 5, 1),
                     KinhNghiem = "10 năm", MoTa = "Quản lý nhân sự", MucLuong = 27000000
+                },new NhanVien {
+                    MaNhanVien = "NV013", HoTen = "Đỗ Công Minh", MaSoNV = "NS05", NgaySinh = new DateTime(1998, 2, 12),
+                    ChucVu = "Trưởng phòng NS", PhongBanId = "PBNS", Email = "mdang2186@gmail.com",
+                    SoDienThoai = "0246578427", NgayVaoCongTy = new DateTime(2013, 5, 1),
+                    KinhNghiem = "10 năm", MoTa = "Quản lý nhân sự", MucLuong = 29000000
+                },new NhanVien {
+                    MaNhanVien = "NV014", HoTen = "Đinh Thị Diễm Quỳnh", MaSoNV = "NS06", NgaySinh = new DateTime(1998, 2, 2),
+                    ChucVu = "Trưởng phòng NS", PhongBanId = "PBNS", Email = "diemquynhdinh1010@gmail.com",
+                    SoDienThoai = "0925246012", NgayVaoCongTy = new DateTime(2013, 5, 1),
+                    KinhNghiem = "10 năm", MoTa = "Quản lý nhân sự", MucLuong = 47000000
+                },new NhanVien {
+                    MaNhanVien = "NV015", HoTen = "Trần Thị Thanh Vân", MaSoNV = "NS07", NgaySinh = new DateTime(1986, 12, 12),
+                    ChucVu = "Trưởng phòng NS", PhongBanId = "PBNS", Email = "vantran260304@gmail.com",
+                    SoDienThoai = "0902456012", NgayVaoCongTy = new DateTime(2013, 5, 1),
+                    KinhNghiem = "10 năm", MoTa = "Quản lý nhân sự", MucLuong = 37000000
                 },
             };
 

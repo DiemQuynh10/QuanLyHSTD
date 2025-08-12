@@ -1,0 +1,27 @@
+﻿@* Views/Shared/_SidebarPartial.cshtml *@
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLowerInvariant();
+}
+
+<div class="d-flex flex-column h-100">
+    <div class="sidebar-content flex-grow-1 overflow-auto">
+        <nav class="nav flex-column">
+            <a asp-controller="Home" asp-action="Index"
+               class="nav-link @(currentController == "home" ? "active" : "")">🏠 Tổng quan</a>
+            <a asp-controller="UngViens" asp-action="Index"
+               class="nav-link @(currentController == "ungviens" ? "active" : "")">👤 Ứng viên</a>
+            <a asp-controller="ViTriTuyenDungs" asp-action="Index"
+               class="nav-link @(currentController == "vitrituyendungs" ? "active" : "")">📌 Vị trí tuyển dụng</a>
+            <a asp-controller="LichPhongVans" asp-action="Index"
+               class="nav-link @(currentController == "lichphongvans" ? "active" : "")">💬 Phỏng vấn</a>
+            <a asp-controller="HRPhongVan" asp-action="TrangThaiCho"
+               class="nav-link @(currentController == "hrphongvan" ? "active" : "")"
+               title="Ứng viên cần phỏng vấn vòng 2">⏳ Trạng thái chờ</a>
+            <a asp-controller="ThongKe" asp-action="Index"
+               class="nav-link @(currentController == "thongke" ? "active" : "")">📊 Thống kê & báo cáo</a>
+            <a asp-controller="NhanViens" asp-action="Index"
+               class="nav-link @(currentController == "nhanviens" ? "active" : "")">🧑‍💼 Nhân viên</a>
+        </nav>
+    </div>
+</div>
+

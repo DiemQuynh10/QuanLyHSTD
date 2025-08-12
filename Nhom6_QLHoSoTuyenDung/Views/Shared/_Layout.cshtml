@@ -3,75 +3,50 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ProCV</title>
+    <title>@ViewData["Title"] - CyberFortis</title>
+    <link rel="icon" type="image/png" href="~/images/logo.png" />
 
     <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="~/js/site.js"></script>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
 
     <style>
         body {
             overflow-x: hidden;
+            background: radial-gradient(circle at bottom left, rgba(42,157,143,0.05) 0%, white 100%);
+            background-color: #f3fefc;
         }
 
         .sidebar {
             width: 230px;
-            height: 100vh;
-            background-color: #f8f9fa;
+            min-height: 100vh;
+            background-color: #e6f4f1;
             position: fixed;
             top: 0;
             left: 0;
-            display: flex;
-            flex-direction: column;
             transition: all 0.3s;
-            padding: 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
         }
 
-        .sidebar-scroll {
-            flex: 1 1 auto;
-            overflow-y: auto;
-            padding: 1.5rem 1rem 1rem 1rem;
+        .card {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         }
-
-        .sidebar .nav-link {
-            color: #333;
-        }
-
-            .sidebar .nav-link.active,
-            .sidebar .nav-link:hover {
-                font-weight: bold;
-                background-color: #e2e6ea;
+            .sidebar .nav-link {
+                color: #333;
             }
 
-        .sidebar-profile {
-            flex-shrink: 0;
-            padding: 1rem;
-            background: #2563eb;
-            color: #fff;
-            border-top: 1px solid #e0e0e0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .active-stat {
-            background: #e0e7ff !important;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-            .sidebar-profile .avatar {
-                width: 40px;
-                height: 40px;
-                background: #fff;
-                color: #2563eb;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: bold;
-                font-size: 1.2rem;
-            }
+                .sidebar .nav-link.active,
+                .sidebar .nav-link:hover {
+                    font-weight: bold;
+                    background-color: #cceee7;
+                    color: #2a9d8f;
+                }
 
         .content-wrapper {
             margin-left: 230px;
@@ -81,6 +56,14 @@
         #menuToggle {
             font-size: 1.2rem;
             cursor: pointer;
+        }
+
+        .avatar-circle {
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
+            border-radius: 50%;
+            background-color: #2a9d8f;
         }
 
         @@media (max-width: 768px) {
@@ -98,132 +81,33 @@
             }
         }
     </style>
+    @RenderSection("Styles", required: false)
 </head>
-<!-- ...phần head giữ nguyên... -->
-<body>
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebarMenu">
-        <div class="sidebar-scroll">
-            <h5 class="text-primary mb-4">📝 ProCV</h5>
-            <ul class="nav nav-pills flex-column mb-4">
-                <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">🏠 Tổng quan</a></li>
-                <li><a class="nav-link" asp-controller="UngViens" asp-action="Index">👤 Ứng viên</a></li>
-                <li><a class="nav-link" asp-controller="ViTriTuyenDungs" asp-action="Index">📌 Vị trí tuyển dụng</a></li>
-                <li><a class="nav-link" asp-controller="LichPhongVans" asp-action="Index">💬 Phỏng vấn</a></li>
-                <li><a class="nav-link" asp-controller="ThongKe" asp-action="Index">📊 Thống kê & báo cáo</a></li>
-                <li><a class="nav-link" asp-controller="NhanViens" asp-action="Index">🧑‍💼 Nhân viên</a></li>
-                <li><a class="nav-link" asp-controller="Settings" asp-action="Index">⚙️ Cài đặt</a></li>
-            </ul>
-            @if ((ViewContext.RouteData.Values["controller"]?.ToString() ?? "") == "UngViens")
-            {
-                var trangThai = Context.Request.Query["trangThai"].ToString();
-                Func<string, bool> isActive = (tt) => string.Equals(trangThai, tt, StringComparison.OrdinalIgnoreCase);
 
-                <div class="mb-3">
-                    <div class="fw-bold text-secondary mb-2" style="font-size:1.3em;">THỐNG KÊ NHANH</div>
-                    <ul class="list-unstyled">
-                        <li>
-                            <a class="d-flex justify-content-between align-items-center text-decoration-none text-dark py-1 @(string.IsNullOrEmpty(trangThai) ? "active-stat" : "")"
-                               asp-controller="UngViens" asp-action="Index">
-                                <span><i class="bi bi-people-fill me-1"></i> Tổng ứng viên</span>
-                                <span class="badge bg-secondary fs-6 px-3 py-2" style="font-weight:600;">@ViewBag.TongUngVien</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="d-flex justify-content-between align-items-center text-decoration-none text-dark py-1 @(isActive("Mới") ? "active-stat" : "")"
-                               asp-controller="UngViens" asp-action="Index" asp-route-trangThai="Mới">
-                                <span><i class="bi bi-star me-1"></i> Ứng viên mới</span>
-                                <span class="badge bg-secondary fs-6 px-3 py-2" style="font-weight:600;">@ViewBag.UVMoi</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="d-flex justify-content-between align-items-center text-decoration-none text-dark py-1 @(isActive("Phỏng vấn") ? "active-stat" : "")"
-                               asp-controller="UngViens" asp-action="Index" asp-route-trangThai="Phỏng vấn">
-                                <span><i class="bi bi-calendar-check me-1"></i> Đang phỏng vấn</span>
-                                <span class="badge bg-secondary fs-6 px-3 py-2" style="font-weight:600;">@ViewBag.UVPhongVan</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="d-flex justify-content-between align-items-center text-decoration-none text-dark py-1 @(isActive("Đã duyệt") ? "active-stat" : "")"
-                               asp-controller="UngViens" asp-action="Index" asp-route-trangThai="Đã duyệt">
-                                <span><i class="bi bi-check2-circle me-1"></i> Đã duyệt</span>
-                                <span class="badge bg-secondary fs-6 px-3 py-2" style="font-weight:600;">@ViewBag.UVDaDuyet</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="d-flex justify-content-between align-items-center text-decoration-none text-dark py-1 @(isActive("Đạt") ? "active-stat" : "")"
-                               asp-controller="UngViens" asp-action="Index" asp-route-trangThai="Đạt">
-                                <span><i class="bi bi-trophy me-1"></i> Ứng viên đạt</span>
-                                <span class="badge bg-secondary fs-6 px-3 py-2" style="font-weight:600;">@ViewBag.UVDat</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="d-flex justify-content-between align-items-center text-decoration-none text-dark py-1 @(isActive("Trượt") ? "active-stat" : "")"
-                               asp-controller="UngViens" asp-action="Index" asp-route-trangThai="Trượt">
-                                <span><i class="bi bi-x-circle me-1"></i> Ứng viên trượt</span>
-                                <span class="badge bg-secondary fs-6 px-3 py-2" style="font-weight:600;">@ViewBag.UVTruot</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            }
-            else if ((ViewContext.RouteData.Values["controller"]?.ToString() ?? "") == "ViTriTuyenDungs")
-            {
-                <!-- Thống kê nhanh cho trang Vị trí tuyển dụng (nếu muốn) -->
-                <div class="mb-3">
-                    <div class="fw-bold text-secondary mb-2">THỐNG KÊ VỊ TRÍ</div>
-                    <ul class="list-unstyled">
-                        <li>
-                            <span class="d-flex justify-content-between align-items-center text-dark py-1">
-                                <span><i class="bi bi-briefcase me-1"></i> Tổng vị trí</span>
-                                <span class="badge bg-secondary">@ViewBag.TongViTri</span>
-                            </span>
-                        </li>
-                        <!-- Thêm các thống kê khác nếu cần -->
-                    </ul>
-                </div>
-            }
-            <!-- Có thể thêm else if cho các controller khác nếu muốn -->
-            @if ((ViewContext.RouteData.Values["controller"]?.ToString() ?? "") == "UngViens")
-            {
-                <div>
-                    <div class="fw-bold text-secondary mb-2">KỸ NĂNG PHỔ BIẾN</div>
-                    <span class="badge bg-primary">React</span>
-                    <span class="badge bg-success">Node.js</span>
-                    <span class="badge bg-purple">Python</span>
-                    <span class="badge bg-warning text-dark">JavaScript</span>
-                    <span class="badge bg-danger">UI/UX</span>
-                    <span class="badge bg-info text-dark">Marketing</span>
-                </div>
-            }
+
+<body>
+    @inject IHttpContextAccessor HttpContextAccessor
+
+    
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column p-3" id="sidebarMenu">
+        <div class="d-flex align-items-center mb-3">
+            <img src="~/images/lgo.png" alt="CyberFortis" style="height: 32px;" class="me-2" />
+            <span class="fs-5 fw-bold" style="color: #2a9d8f;">CyberFortis</span>
         </div>
-        <div class="sidebar-profile">
-            <div class="avatar">
-                @((User.Identity?.Name ?? "NA").Split(' ').LastOrDefault()?.Substring(0, 1) ?? "N")
-            </div>
-            <div>
-                <div class="fw-bold">@User.Identity?.Name ?? "Người dùng"</div>
-                <div style="font-size: 0.9em;">HR Manager</div>
-            </div>
-            <a href="/Settings" class="ms-auto text-white"><i class="bi bi-gear"></i></a>
-        </div>
+
+        @await Html.PartialAsync("_SidebarPartial")
     </div>
-    <!-- ...phần còn lại giữ nguyên... -->
+
     <!-- Topbar -->
-    <header class="p-3 bg-white shadow-sm d-flex justify-content-between align-items-center" style="margin-left: 230px;">
-        <span id="menuToggle" class="d-md-none"><i class="fas fa-bars"></i></span>
-        <div class="d-flex align-items-center">
-            <span class="me-2 fw-bold">@User.Identity?.Name ?? "Người dùng"</span>
-            <img src="https://via.placeholder.com/32" class="rounded-circle" alt="avatar" />
-        </div>
-    </header>
+    @await Html.PartialAsync("_TopbarPartial")
 
     <!-- Main Content -->
     <main class="content-wrapper p-4">
         @RenderBody()
     </main>
 
-    <!-- ✅ Thông báo thành công / lỗi (hiện góc phải trên) -->
+    <!-- Alert -->
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3" role="alert" style="z-index:1050;">
@@ -238,13 +122,17 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-
-    <!-- JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js"></script>
 
+    <!-- Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Toggle Sidebar -->
     <script>
         const sidebar = document.getElementById("sidebarMenu");
         const toggle = document.getElementById("menuToggle");
@@ -252,7 +140,26 @@
             sidebar.classList.toggle("show");
         });
     </script>
-
+    <script src="~/js/chart-colors.js"></script>
     @RenderSection("Scripts", required: false)
+
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Xác nhận đăng xuất</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Không</button>
+                    <a href="/NguoiDungs/Logout" class="btn btn-danger">Có, đăng xuất</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

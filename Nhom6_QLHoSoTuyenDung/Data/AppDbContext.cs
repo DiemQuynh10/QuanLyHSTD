@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Nhom6_QLHoSoTuyenDung.Models;
+using Nhom6_QLHoSoTuyenDung.Models.Entities;
 
-    public class AppDbContext : DbContext
+public class AppDbContext : DbContext
     {
         public AppDbContext (DbContextOptions<AppDbContext> options)
             : base(options)
@@ -16,21 +16,22 @@ using Nhom6_QLHoSoTuyenDung.Models;
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<LichPhongVan>()
-            .HasOne(p => p.ViTriTuyenDung)
-            .WithMany()
-            .HasForeignKey(p => p.ViTriId)
-            .OnDelete(DeleteBehavior.Restrict);
+    .HasOne(l => l.PhongPhongVan)
+    .WithMany(p => p.LichPhongVans)
+    .HasForeignKey(l => l.PhongPhongVanId)
+    .OnDelete(DeleteBehavior.Restrict);
+
 
         modelBuilder.Entity<LichPhongVan>()
-            .HasOne(p => p.PhongPhongVan)
-            .WithMany()
-            .HasForeignKey(p => p.PhongPhongVanId)
-            .OnDelete(DeleteBehavior.Restrict);
+     .HasOne(l => l.UngVien)
+     .WithMany()
+     .HasForeignKey(l => l.UngVienId)
+     .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<LichPhongVan>()
-            .HasOne(p => p.UngVien)
+            .HasOne(l => l.ViTriTuyenDung)
             .WithMany()
-            .HasForeignKey(p => p.UngVienId)
+            .HasForeignKey(l => l.ViTriId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 

@@ -1,0 +1,128 @@
+﻿@model Nhom6_QLHoSoTuyenDung.Models.ViewModels.NguoiPhongVanVM.LichSuPhongVanVM
+
+@using Nhom6_QLHoSoTuyenDung.Models.Enums
+
+@{
+    // 📛 Avatar từ tên ứng viên
+    string avatarText = string.IsNullOrEmpty(Model.HoTenUngVien)
+        ? "?"
+        : Model.HoTenUngVien.Trim().Split(' ').LastOrDefault()?.Substring(0, 1).ToUpper();
+
+    // ✅ Trạng thái Ứng viên - dùng enum
+    var trangThaiUVEnum = EnumExtensions.GetEnumFromDisplayName<TrangThaiUngVienEnum>(Model.TrangThai);
+    string trangThaiUngVienText = trangThaiUVEnum?.GetDisplayName() ?? "Chưa đề xuất";
+
+    string badgeUngVien = trangThaiUVEnum switch
+    {
+        TrangThaiUngVienEnum.DaTuyen => "bg-success",
+        TrangThaiUngVienEnum.TuChoi => "bg-danger",
+        TrangThaiUngVienEnum.CanPhongVanLan2 => "bg-warning text-dark",
+        _ => "bg-secondary"
+    };
+
+
+    // ✅ Trạng thái Phỏng vấn - dùng enum
+    var trangThaiPVEnum = EnumExtensions.GetEnumFromDisplayName<TrangThaiPhongVanEnum>(Model.TrangThaiPhongVan);
+    string trangThaiPhongVanText = trangThaiPVEnum?.GetDisplayName() ?? "Không rõ";
+
+    string badgePhongVan = trangThaiPVEnum switch
+    {
+        TrangThaiPhongVanEnum.HoanThanh => "bg-success",
+        TrangThaiPhongVanEnum.DaLenLich => "bg-info text-dark",
+        TrangThaiPhongVanEnum.Huy => "bg-danger",
+        _ => "bg-secondary"
+    };
+
+}
+
+
+<div class="bg-white border rounded-4 p-4 mb-4 shadow-sm card-pv-item"
+     data-name="@Model.HoTenUngVien"
+     data-email="@Model.Email"
+     data-vitri="@Model.ViTriUngTuyen"
+     data-status="@Model.TrangThaiPhongVan"
+     data-date="@Model.ThoiGian?.ToString("yyyy-MM-dd")">
+
+    <div class="d-flex justify-content-between align-items-start">
+        <!-- Avatar + Thông tin -->
+        <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center"
+                 style="width: 60px; height: 60px; font-size: 1.2rem;">
+                @avatarText
+            </div>
+            <div class="ms-3">
+                <h5 class="fw-bold mb-0">@Model.HoTenUngVien</h5>
+                <div class="text-primary">@Model.ViTriUngTuyen</div>
+                <div class="text-muted small">
+                    <i class="bi bi-envelope me-1"></i>@Model.Email &nbsp;
+                    <i class="bi bi-telephone me-1"></i>@Model.Sdt
+                </div>
+            </div>
+        </div>
+
+        <!-- Điểm & Trạng thái -->
+        <div class="text-center">
+            <div class="badge @(Model.TrangThai == "TuChoi" ? "bg-danger text-white" : "bg-success text-white") rounded-circle p-3 fs-5">
+                @(Model.DiemTrungBinh?.ToString("0.0") ?? "–")
+            </div>
+
+            <div class="mt-1">
+                <span class="badge @badgeUngVien me-2">
+                    <i class="bi bi-person-check-fill me-1"></i> Trạng thái: @trangThaiUngVienText
+                </span>
+            </div>
+
+            <div class="mt-1">
+                <span class="badge @badgePhongVan">
+                    <i class="bi bi-calendar-check-fill me-1"></i> Phỏng vấn: @trangThaiPhongVanText
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Thông tin phỏng vấn -->
+        <div class="col-md-4">
+            <div class="p-3 rounded bg-light">
+                <h6 class="fw-bold text-primary"><i class="bi bi-calendar-event me-1"></i> Thông tin phỏng vấn</h6>
+                <p class="mb-1">Ngày: <strong>@Model.ThoiGian?.ToString("dd/MM/yyyy")</strong></p>
+                <p class="mb-1">Thời gian: <strong>@Model.ThoiGian?.ToString("HH:mm")</strong></p>
+                <p>Người PV: <strong>@Model.TenNguoiPhongVan</strong></p>
+            </div>
+        </div>
+
+        <!-- Đánh giá chi tiết -->
+        <div class="col-md-4">
+            <div class="p-3 rounded" style="background-color: #d4f7dc">
+                <h6 class="fw-bold text-success"><i class="bi bi-star-fill me-1"></i> Đánh giá chi tiết</h6>
+                <p class="mb-1">Kỹ thuật: <strong>@Model.DiemKyThuat/10</strong></p>
+                <p class="mb-1">Giao tiếp: <strong>@Model.DiemGiaoTiep/10</strong></p>
+                <p>Thái độ: <strong>@Model.DiemThaiDo/10</strong></p>
+            </div>
+        </div>
+
+        <!-- Nhận xét & đề xuất -->
+        <div class="col-md-4">
+            <div class="p-3 rounded" style="background-color: #f3e9fc">
+                <h6 class="fw-bold text-purple"><i class="bi bi-chat-dots-fill me-1"></i> Nhận xét & Đề xuất</h6>
+                @if (!string.IsNullOrWhiteSpace(Model.DeXuatHienThi))
+                {
+                    <p class="mb-1">Đề xuất: <strong>@Model.DeXuatHienThi</strong></p>
+                }
+                <p>Nhận xét:</p>
+                <p class="fst-italic">"@Model.NhanXet"</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nút tải CV -->
+    @if (!string.IsNullOrEmpty(Model.LinkCV))
+    {
+        <div class="mt-3">
+            <a class="btn btn-outline-secondary btn-sm" target="_blank" download
+               href="@Url.Content($"~/cv/{Model.LinkCV}")">
+                <i class="bi bi-file-earmark-arrow-down me-1"></i> Tải CV
+            </a>
+        </div>
+    }
+</div>

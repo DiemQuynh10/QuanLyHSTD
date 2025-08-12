@@ -1,0 +1,223 @@
+﻿@using Nhom6_QLHoSoTuyenDung.Models.Enums
+@using Nhom6_QLHoSoTuyenDung.Models.ViewModels.NguoiPhongVanVM
+@model DanhGiaPhongVanVM
+
+@{
+    Layout = "~/Views/Shared/_LayoutInterviewer.cshtml";
+    ViewData["Title"] = "Đánh giá Ứng viên";
+
+    Enum.TryParse(ViewBag.TrangThai?.ToString(), out TrangThaiPhongVanEnum trangThai);
+    float? diemTrungBinh = ViewBag.DiemTrungBinh as float?;
+    string nhanXet = ViewBag.NhanXet as string ?? "";
+    string deXuat = ViewBag.DeXuat as string ?? "";
+    bool daDanhGia = ViewBag.DaDanhGia != null && (bool)ViewBag.DaDanhGia;
+
+    bool daHoanThanh = trangThai == TrangThaiPhongVanEnum.HoanThanh;
+
+    string mauDiem = diemTrungBinh >= 8 ? "bg-success" :
+                     diemTrungBinh >= 6 ? "bg-primary" :
+                     diemTrungBinh >= 4 ? "bg-warning" : "bg-danger";
+
+    string phanLoai = diemTrungBinh >= 8 ? "Xuất sắc" :
+                      diemTrungBinh >= 6 ? "Tốt" :
+                      diemTrungBinh >= 4 ? "Trung bình" : "Kém";
+}
+
+<div class="container mt-4">
+    <a asp-controller="InterviewerDashboard" asp-action="LichPhongVan" class="btn btn-sm btn-outline-secondary mb-3">
+        <i class="bi bi-arrow-left"></i> Quay lại
+    </a>
+
+    <h3 class="fw-bold text-primary mb-3">
+        <i class="bi bi-star-fill me-1"></i> Đánh giá Ứng viên
+    </h3>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="bi bi-check-circle-fill me-1"></i> @TempData["Success"]
+        </div>
+    }
+
+    <div class="card p-4 shadow-sm border-0 mb-4">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h4 class="fw-bold">@Model.TenUngVien</h4>
+                <p class="text-muted">Ứng tuyển: <strong>@Model.TenViTri</strong></p>
+
+                @if (!string.IsNullOrEmpty(Model.KinhNghiem))
+                {
+                    <div class="mb-2">
+                        <i class="bi bi-patch-check text-info me-1"></i>
+                        <strong>Kinh nghiệm:</strong> @Model.KinhNghiem
+                    </div>
+                }
+
+                <div>
+                    <i class="bi bi-calendar3 me-1"></i> @Model.ThoiGian.ToString("dd/MM/yyyy HH:mm") <br />
+                    <i class="bi bi-geo-alt me-1"></i> Phòng: @Model.TenPhong
+                </div>
+            </div>
+
+            @if (diemTrungBinh != null)
+            {
+                <div class="text-center">
+                    <div class="rounded-circle @mauDiem text-white fw-bold fs-4 d-flex align-items-center justify-content-center"
+                         style="width: 100px; height: 100px;">
+                        @diemTrungBinh
+                    </div>
+                    <div class="mt-2 fw-bold text-uppercase">@phanLoai</div>
+                </div>
+            }
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+            @if (daDanhGia)
+            {
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#xemDanhGiaModal">
+                    <i class="bi bi-eye-fill me-1"></i> Xem đánh giá chi tiết
+                </button>
+            }
+            else
+            {
+                <a asp-action="DanhGiaChiTiet" asp-route-lichPhongVanId="@Model.LichPhongVanId" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil-square me-1"></i> Đánh giá chi tiết
+                </a>
+            }
+
+
+
+            <button class="btn btn-outline-secondary" onclick="xemCV('@Model.UngVienId')">
+                <i class="bi bi-file-earmark-text me-1"></i> Tài liệu CV
+            </button>
+
+            @if (daDanhGia && diemTrungBinh >= 1)
+            {
+                <a asp-action="InDanhGia" asp-route-id="@Model.LichPhongVanId" class="btn btn-outline-dark">
+                    <i class="bi bi-printer me-1"></i> In đánh giá
+                </a>
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(nhanXet))
+        {
+            <div class="mt-4">
+                <label class="fw-bold">Nhận xét:</label>
+                <div class="border rounded p-2">@nhanXet</div>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(deXuat))
+        {
+            // ❌ Lỗi: đang ở trong khối `{ }` mà lại dùng `@{`
+            // 👉 Sửa lại bằng cách BỎ @ phía trước
+            string deXuatRaw = deXuat.Trim();
+
+            var deXuatLabel = deXuatRaw.Equals("TiepNhan", StringComparison.OrdinalIgnoreCase)
+            ? "Tiếp nhận"
+            : deXuatRaw.Equals("TuChoi", StringComparison.OrdinalIgnoreCase)
+            ? "Từ chối"
+            : "Cần phỏng vấn lại";
+
+            var mauDeXuat = deXuatRaw.Equals("TiepNhan", StringComparison.OrdinalIgnoreCase)
+            ? "success"
+            : deXuatRaw.Equals("TuChoi", StringComparison.OrdinalIgnoreCase)
+            ? "danger"
+            : "warning";
+
+            var iconDeXuat = deXuatRaw.Equals("TiepNhan", StringComparison.OrdinalIgnoreCase)
+            ? "check-circle-fill"
+            : deXuatRaw.Equals("TuChoi", StringComparison.OrdinalIgnoreCase)
+            ? "x-circle-fill"
+            : "exclamation-circle-fill";
+
+            <div class="mt-3">
+                <label class="fw-bold">Đề xuất:</label>
+                <div class="alert alert-@mauDeXuat">
+                    <i class="bi bi-@iconDeXuat me-1"></i> @deXuatLabel
+                </div>
+            </div>
+        }
+
+
+        @if (!daDanhGia)
+        {
+            <div class="alert alert-warning mt-4">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                Vui lòng thực hiện <strong>Đánh giá chi tiết</strong> để hoàn tất!
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info mt-4">
+                <i class="bi bi-info-circle-fill me-1"></i>
+                Hệ thống sẽ tự động <strong>cập nhật trạng thái ứng viên</strong> dựa theo đề xuất bạn đã chọn trong phần đánh giá chi tiết.
+            </div>
+        }
+    </div>
+</div>
+@functions {
+    string PhanLoai(int? diem)
+    {
+        if (diem == null) return "Chưa đánh giá";
+        return diem >= 8 ? "Xuất sắc" : diem >= 6 ? "Tốt" : diem >= 4 ? "Trung bình" : "Kém";
+    }
+}
+
+@section Scripts {
+    <script>
+        function xemCV(ungVienId) {
+            window.open("/InterviewerDashboard/XemCV?ungVienId=" + ungVienId, "_blank");
+        }
+    
+    </script>
+    <!-- 🟦 Modal xem Đánh giá chi tiết -->
+    <div class="modal fade" id="xemDanhGiaModal" tabindex="-1" aria-labelledby="xemDanhGiaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold" id="xemDanhGiaModalLabel">
+                        <i class="bi bi-card-checklist me-1 text-primary"></i> Đánh giá chi tiết
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Kỹ năng chuyên môn</label>
+                        <input class="form-control" value="@ViewBag.KyNangChuyenMon - @PhanLoai((int?)ViewBag.KyNangChuyenMon)" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Giao tiếp</label>
+                            <input class="form-control" value="@ViewBag.GiaoTiep" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Giải quyết vấn đề</label>
+                            <input class="form-control" value="@ViewBag.GiaiQuyetVanDe" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Thái độ làm việc</label>
+                            <input class="form-control" value="@ViewBag.ThaiDoLamViec" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tinh thần học hỏi</label>
+                            <input class="form-control" value="@ViewBag.TinhThanHocHoi" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Đề xuất</label>
+                            <input class="form-control" value="@ViewBag.DeXuat" readonly />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Nhận xét</label>
+                            <textarea class="form-control" rows="3" readonly>@ViewBag.NhanXet</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}

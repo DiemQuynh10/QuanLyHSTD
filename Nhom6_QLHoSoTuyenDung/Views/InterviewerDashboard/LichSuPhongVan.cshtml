@@ -1,0 +1,157 @@
+﻿@using Nhom6_QLHoSoTuyenDung.Models.ViewModels.NguoiPhongVanVM
+@model LichSuPhongVanTongHopVM
+
+@{
+    ViewData["Title"] = "Lịch sử phỏng vấn";
+}
+
+<div class="container-fluid px-4 mt-4">
+
+    <p class="text-muted">Theo dõi và quản lý tất cả các buổi phỏng vấn đã thực hiện</p>
+</div>
+    <!-- Thống kê -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="bg-white shadow-sm rounded-4 p-3 text-center border-start border-4 border-primary">
+                <div class="fs-3 fw-bold text-primary">@Model.ThongKe.TongPhongVan</div>
+                <div class="text-muted">Đã phỏng vấn</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bg-white shadow-sm rounded-4 p-3 text-center border-start border-4 border-success">
+                <div class="fs-3 fw-bold text-success">@Model.ThongKe.DaTiepNhan</div>
+                <div class="text-muted">Hoàn thành</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bg-white shadow-sm rounded-4 p-3 text-center border-start border-4 border-danger">
+                <div class="fs-3 fw-bold text-danger">@Model.ThongKe.TuChoi</div>
+                <div class="text-muted">Huy</div>
+            </div>
+        </div>
+    </div>
+<div id="filterBar" class="d-flex flex-wrap justify-content-between align-items-center mb-4 sticky-top bg-white py-2 px-3 border-bottom shadow-sm" style="z-index: 100;">
+    <!-- Ô tìm kiếm -->
+    <div class="input-group me-3 mb-2" style="max-width: 300px;">
+        <span class="input-group-text bg-white"><i class="bi bi-search text-primary"></i></span>
+        <input type="text" class="form-control" placeholder="🔍 Tìm kiếm theo tên, vị trí, email..." id="searchInput" />
+    </div>
+
+    <!-- Bộ lọc trạng thái -->
+    <div class="btn-group mb-2" role="group">
+        <button class="btn btn-outline-primary active" data-status="">📋 Tất cả</button>
+        <button class="btn btn-outline-success" data-status="Hoàn thành">
+            <i class="bi bi-check2-circle me-1"></i> Hoàn thành
+        </button>
+        <button class="btn btn-outline-danger" data-status="Hủy">
+            <i class="bi bi-x-circle me-1"></i> Hủy
+        </button>
+    </div>
+
+
+    <!-- Lọc thời gian -->
+    <div class="dropdown mb-2">
+        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="timeFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            📅 Tất cả thời gian
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="timeFilterDropdown">
+            <li><a class="dropdown-item active" href="#" data-time="">Tất cả</a></li>
+            <li><a class="dropdown-item" href="#" data-time="7">7 ngày gần nhất</a></li>
+            <li><a class="dropdown-item" href="#" data-time="30">30 ngày gần nhất</a></li>
+            <li><a class="dropdown-item" href="#" data-time="90">3 tháng gần nhất</a></li>
+        </ul>
+    </div>
+</div>
+
+  @section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("searchInput");
+            const filterButtons = document.querySelectorAll("[data-status]");
+            const timeItems = document.querySelectorAll("[data-time]");
+
+            function applyFilters() {
+                const keyword = searchInput.value.trim().toLowerCase();
+                const selectedStatus = document.querySelector(".btn-group .active")?.getAttribute("data-status") || "";
+                const selectedTime = document.querySelector(".dropdown-menu .active")?.getAttribute("data-time") || "";
+
+                document.querySelectorAll(".card-pv-item").forEach(card => {
+                    const name = card.getAttribute("data-name")?.toLowerCase() || "";
+                    const email = card.getAttribute("data-email")?.toLowerCase() || "";
+                    const vitri = card.getAttribute("data-vitri")?.toLowerCase() || "";
+                    const status = card.getAttribute("data-status") || "";
+                    const dateStr = card.getAttribute("data-date") || "";
+
+                    // Kiểm tra từ khoá
+                    const matchKeyword = name.includes(keyword) || email.includes(keyword) || vitri.includes(keyword);
+
+                    // Kiểm tra trạng thái
+                    const matchStatus = !selectedStatus || status === selectedStatus;
+
+                    // Kiểm tra thời gian
+                    const date = new Date(dateStr);
+                    const now = new Date();
+                    let matchTime = true;
+                    if (selectedTime) {
+                        const days = parseInt(selectedTime);
+                        const threshold = new Date();
+                        threshold.setDate(now.getDate() - days);
+                        matchTime = date >= threshold;
+                    }
+
+                    // Hiển thị hoặc ẩn
+                    card.style.display = (matchKeyword && matchStatus && matchTime) ? "block" : "none";
+                });
+            }
+
+            // Sự kiện
+            searchInput.addEventListener("input", applyFilters);
+
+            filterButtons.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    filterButtons.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    applyFilters();
+                });
+            });
+
+            timeItems.forEach(item => {
+                item.addEventListener("click", function () {
+                    timeItems.forEach(i => i.classList.remove("active"));
+                    item.classList.add("active");
+                    document.getElementById("timeFilterDropdown").innerHTML = "📅 " + item.innerText;
+                    applyFilters();
+                });
+            });
+        });
+    </script>
+
+    <script>
+        // ẩn khi cuộn thanh tìm kiếm xuống, hiện khi kéo lên
+        let lastScrollTop = 0;
+        const filterBar = document.getElementById("filterBar");
+
+        window.addEventListener("scroll", function () {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (currentScroll > lastScrollTop) {
+                // 👉 Cuộn xuống → ẩn
+                filterBar.style.transform = "translateY(-100%)";
+                filterBar.style.transition = "transform 0.3s ease";
+            } else {
+                // 👆 Cuộn lên → hiện
+                filterBar.style.transform = "translateY(0)";
+                filterBar.style.transition = "transform 0.3s ease";
+            }
+
+            lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // không để âm
+        }, false);
+    </script>
+
+
+  }
+
+@foreach (var item in Model.DanhSachLichSu)
+{
+    @await Html.PartialAsync("_CardKetQuaPhongVan", item)
+}

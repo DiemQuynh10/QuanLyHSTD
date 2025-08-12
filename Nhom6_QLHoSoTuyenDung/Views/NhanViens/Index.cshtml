@@ -1,95 +1,1294 @@
-﻿@model IEnumerable<Nhom6_QLHoSoTuyenDung.Models.NhanVien>
+﻿@model IEnumerable<Nhom6_QLHoSoTuyenDung.Models.Entities.NhanVien>
+@using Microsoft.AspNetCore.Http
+@using System.Text.Json
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    ViewData["Title"] = "Index";
+ var users = ViewBag.Users as List<Nhom6_QLHoSoTuyenDung.Models.Entities.NguoiDung> ?? new();
+var roleLabels = new[] { "Admin", "HR", "Interviewer" };
+var roleCounts = roleLabels
+    .Select(role => users.Count(u => u.VaiTro == role))
+    .ToArray(); 
+
+
+
+    ViewData["Title"] = "Quản lý nhân viên";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // Query params
+    var q = HttpContextAccessor.HttpContext.Request.Query;
+    var selKN = ViewBag.SelectedKN as List<string> ?? new();
+    var accIds = ViewBag.AccountIds as List<string> ?? new();
+    var pbLabels = ViewBag.PhongBans as List<string> ?? new();
+    var pbCounts = ViewBag.PhongBanCounts as List<int> ?? new();
+    var rawDates = ViewBag.RawDates as List<string> ?? new();
+    var pbColors = new[] { "#36A2EB", "#FF6384", "#FFCE56", "#4BC0C0", "#9966FF" };
+    // Dữ liệu candidates (đã trúng tuyển) & employees
+    var ungVienDatList = ViewBag.Candidates as List<Nhom6_QLHoSoTuyenDung.Models.ViewModels.CandidateVm>;
+
+    var candidates = ViewBag.Candidates as List<Nhom6_QLHoSoTuyenDung.Models.ViewModels.CandidateVm> ?? new();
+
+    string search = q["search"];
+    // Danh sách vị trí filter (unique)
+    var positions = candidates
+        .Select(c => (string)c.ViTri)
+        .Distinct()
+        .OrderBy(x => x)
+        .ToList();
+    var employees = Model.ToList();
+    var roles = new[] { "Admin", "HR", "Interviewer" };
+    var ageList = Model.Select(n => n.NgaySinh.HasValue
+                        ? DateTime.Now.Year - n.NgaySinh.Value.Year
+                        : 0).ToList();
 }
 
-<h1>Index</h1>
+@section Styles {
+    <style>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.HoTen)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MaSoNV)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NgaySinh)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ChucVu)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SoDienThoai)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NgayVaoCongTy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.KinhNghiem)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MoTa)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MucLuong)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PhongBan)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.HoTen)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MaSoNV)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NgaySinh)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ChucVu)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SoDienThoai)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NgayVaoCongTy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.KinhNghiem)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MoTa)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MucLuong)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PhongBan.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.MaNhanVien">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.MaNhanVien">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.MaNhanVien">Delete</a>
-            </td>
-        </tr>
+        /* summary cards */
+        .card-summary {
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+        }
+        /* avatar tròn */
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-right: .5rem;
+        }
+
+        /* badge vai trò & trạng thái */
+        .badge-role {
+            font-size: .75rem;
+        }
+
+        .badge-status {
+            font-size: .75rem;
+        }
+        .chart-fixed {
+  height: 320px; /* tăng từ 260px lên */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-    </tbody>
-</table>
+
+        /* pagination phía dưới */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: .75rem;
+        }
+
+        /* different backgrounds for each summary card */
+        .row.g-3.mb-4 > .col-md-3:nth-child(1) .card-summary {
+            background-color: #e3f2fd;
+            border-color: #90caf9;
+        }
+
+        .row.g-3.mb-4 > .col-md-3:nth-child(2) .card-summary {
+            background-color: #e8f5e9;
+            border-color: #a5d6a7;
+        }
+
+        .row.g-3.mb-4 > .col-md-3:nth-child(3) .card-summary {
+            background-color: #fff3e0;
+            border-color: #ffcc80;
+        }
+
+        .row.g-3.mb-4 > .col-md-3:nth-child(4) .card-summary {
+            background-color: #f3e5f5;
+            border-color: #ce93d8;
+        }
+        /* --- Common table styling --- */
+        .table-responsive.table-frame {
+            max-height: 450px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .table-fixed-header thead th {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 2;
+        }
+
+        .table-responsive th {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 2;
+        }
+
+        /* Chung cho cả 2 bảng: cố định header */
+        .table-fixed-header thead th {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            z-index: 2;
+        }
+
+        /* Riêng khung bảng (ứng viên) */
+        .table-candidate {
+            max-height: 450px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        /* default chart container height */
+        .chart-container {
+            height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* avatar tròn */
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-right: .5rem;
+        }
+
+        /* badge vai trò & trạng thái */
+        .badge-role {
+            font-size: .75rem;
+        }
+
+        .badge-status {
+            font-size: .75rem;
+        }
+
+        /* pagination phía dưới */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: .75rem;
+        }
+
+        
+
+        .chart-split {
+            display: flex;
+            height: 260px;
+        }
+
+            .chart-split > .chart-box {
+                flex: 2;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .chart-split > .legend-box-wrap {
+                flex: 1;
+                padding-left: 1rem;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+        .legend-box {
+            display: inline-block;
+            width: 12px;
+            height: 8px;
+            margin-right: 8px;
+        }
+
+        .action-menu .btn {
+            border: none;
+            background: transparent;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: .5rem;
+            justify-content: center;
+        }
+
+        .readonly {
+            background: #e9ecef;
+        }
+    </style>
+}
+<div class="container mt-4">
+    <!-- alert container -->
+    <div id="alertContainer"></div>
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="fw-bold">Quản lý nhân viên</h2>
+            <p class="text-muted mb-0">Tìm kiếm, lọc &amp; quản lý nhân viên</p>
+        </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate">➕ Thêm nhân viên</button>
+            </div>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="row g-3 mb-4 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label">Tìm kiếm</label>
+            <input name="keyword" value="@q["keyword"]" class="form-control"
+                   placeholder="Tìm kiếm liên quan..." />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Phòng ban</label>
+            <select name="phongBan" class="form-select">
+                <option value="">Tất cả</option>
+                @foreach (var pb in pbLabels)
+                {
+                    <option value="@pb" selected="@(q["phongBan"] == pb)">@pb</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Chức vụ</label>
+            <select name="chucVu" class="form-select">
+                <option value="">Tất cả</option>
+                @foreach (var cv in ViewBag.ChucVus as List<string>)
+                {
+                    <option value="@cv" selected="@(q["chucVu"] == cv)">@cv</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Kinh nghiệm</label>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                        type="button" data-bs-toggle="dropdown">
+                    @if (!selKN.Any())
+                    {
+                        <span>Chọn khoảng</span>
+                    }
+                    else
+                    {
+
+                        <span>@string.Join(", ", selKN) năm</span>
+                    }
+                </button>
+                <div class="dropdown-menu p-2">
+                    @{
+                        var opts = new[] { "1-2", "3-5", "6-8", ">8" };
+                    }
+                    @foreach (var op in opts)
+                    {
+                        var id = op.Replace("-", "_").Replace(">", "gt");
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="kinhNghiemFilters" value="@op" id="kn_@id"
+                                   @(selKN.Contains(op) ? "checked" : "") />
+                            <label class="form-check-label" for="kn_@id">@op năm</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-100">Lọc</button>
+            <button type="button" id="btnReset" class="btn btn-secondary w-100">Đặt lại</button>
+        </div>
+    </form>
+
+    <!-- Summary -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card-summary">
+                <div class="text-muted">Tổng nhân viên</div>
+                <div class="fs-3 fw-bold">@Model.Count()</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-summary">
+                <div class="text-muted">Đang hoạt động</div>
+                <div class="fs-3 fw-bold">@Model.Count(n => n.NgayVaoCongTy != null)</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-summary">
+                <div class="text-muted">Quản lý</div>
+                <div class="fs-3 fw-bold">
+                    @Model.Count(n => (n.ChucVu ?? "").ToLower().Contains("trưởng phòng"))
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-summary">
+                <div class="text-muted">Phòng ban</div>
+                <div class="fs-3 fw-bold">@pbLabels.Count()</div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Main Charts: Tăng trưởng + Vai trò -->
+    <div class="row g-4 mb-4">
+        <!-- Growth -->
+        <div class="col-md-6">
+            <div class="card p-3 rounded-4 shadow-sm h-100">
+                <div class="d-flex justify-content-between mb-2">
+                    <div class="text-muted">📈 Tăng trưởng nhân sự</div>
+                    <select id="growthMode" class="form-select w-auto">
+                        <option>Tháng</option>
+                        <option>Quý</option>
+                        <option selected>Năm</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chartTangTruong"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chức vụ with HTML legend -->
+        <!-- … -->
+        <div class="col-md-6">
+            <div class="card p-3 rounded-4 shadow-sm h-100">
+                <div class="text-muted mb-2">Chức vụ</div>
+                <div class="d-flex h-100">
+                    <!-- 2/3: chart -->
+                    <div style="flex:2;">
+                        <canvas id="chartChucVu"></canvas>
+                    </div>
+                    <!-- 1/3: custom legend -->
+                    <div style="flex:1; padding-left:1rem; overflow-y:auto;">
+                        <ul class="list-unstyled mb-0">
+                            @{
+                                var grp = Model
+                                .GroupBy(n => n.ChucVu ?? "Unknown")
+                                .Select(g => new { label = g.Key, count = g.Count() })
+                                .ToList();
+                            }
+                            @for (int i = 0; i < grp.Count; i++)
+                            {
+                                // cycle through the colour array
+                                var color = pbColors[i % pbColors.Length];
+                                <li class="d-flex align-items-center mb-2">
+                                    <span class="legend-box" style="background:@color;"></span>
+                                    @grp[i].label
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- … -->
+       <!-- Secondary Charts: chia đều 4 biểu đồ -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-4">
+    <div class="col">
+        <div class="card p-3 rounded-4 shadow-sm h-100">
+            <div class="text-muted mb-2 fw-semibold">📊 Phân bổ phòng ban</div>
+            <div style="height:300px; width: 100%;">
+                <canvas id="chartPhongBan"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card p-3 rounded-4 shadow-sm h-100">
+            <div class="text-muted mb-2 fw-semibold">👤 Độ tuổi nhân viên</div>
+            <div style="height:300px; width: 100%;">
+                <canvas id="chartDoTuoi"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card p-3 rounded-4 shadow-sm h-100">
+            <div class="text-muted mb-2 fw-semibold">💼 Kinh nghiệm</div>
+            <div style="height:300px; width: 100%;">
+                <canvas id="chartKinhNghiem"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card p-3 rounded-4 shadow-sm h-100">
+            <div class="text-muted mb-2 fw-semibold">🧑‍💼 Vai trò</div>
+            <div style="height:300px; width: 100%;">
+                <canvas id="chartVaiTro"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+            <!-- ===== Nhân viên ===== -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <!-- Tiêu đề & tổng NV -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">👥 Nhân viên</h5>
+                        <span class="text-muted">Tổng NV: @Model.Count()</span>
+                    </div>
+
+                    <!-- Thanh tìm kiếm nằm trong khung scroll -->
+                    <div class="input-group input-group-sm mb-3" style="max-width:360px;">
+                        <input type="text"
+                               id="searchEmployee"
+                               class="form-control"
+                               placeholder="Tìm kiếm nhân viên..." />
+                        <button class="btn btn-outline-secondary"
+                                id="btnSearchEmployee"
+                                type="button">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+
+                    <!-- Khung cuộn chứa cả header và body -->
+                    <div class="table-responsive table-frame">
+                        <table id="employeeTable"
+                               class="table table-hover mb-0 table-fixed-header">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Họ tên</th>
+                                    <th>Email</th>
+                                    <th>Phòng ban</th>
+                                    <th>Chức vụ</th>
+                                    <th>Kinh nghiệm</th>
+                                    <th class="text-center">HĐ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var nv in Model)
+                                {
+                                    <tr>
+                                        <td>@nv.HoTen</td>
+                                        <td>@nv.Email</td>
+                                        <td>@nv.PhongBan?.TenPhong</td>
+                                        <td>@nv.ChucVu</td>
+                                        <td>@nv.KinhNghiem năm</td>
+                                        <td class="text-center">
+                                            <a asp-controller="NhanViens"
+                                               asp-action="Details"
+                                               asp-route-id="@nv.MaNhanVien"
+                                               class="btn btn-link text-primary p-1"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               title="Xem chi tiết">
+                                                <i class="bi bi-eye-fill fs-5"></i>
+                                            </a>
+
+                                            @if (!((List<string>)ViewBag.AccountIds).Contains(nv.MaNhanVien))
+                                            {
+                                                <button type="button"
+                                                        class="btn btn-link text-success p-1"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalCreateAccount"
+                                                        data-nvid="@nv.MaNhanVien"
+                                                        title="Tạo tài khoản"
+                                                        data-bs-placement="top">
+<span style="font-size: 1.25rem;">👤</span>
+                                                </button>
+                                            }
+                                        </td>
+
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+
+                        <!-- Footer nhỏ bên dưới bảng -->
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                Hiển thị
+                                <span id="displayCount">@Model.Count()</span>
+                                / tổng <span>@Model.Count()</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+        <!-- Create Account Modal -->
+        <div class="modal fade" id="modalCreateAccount" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <form id="formCreateAccount"
+                      asp-action="CreateAccount"
+                      method="post"
+                      class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">➕ Tạo tài khoản</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="accMaNhanVien" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Vai trò</label>
+                            <select name="vaiTro" id="accRole" class="form-select" required>
+                                <option value="">Chọn vai trò</option>
+                                <option value="Admin">Admin</option>
+                                <option value="HR">HR</option>
+                                <option value="Interviewer">Interviewer</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu xác nhận</label>
+                            <input type="password"
+                                   name="currentPassword"
+                                   id="accPassword"
+                                   class="form-control"
+                                   placeholder="Nhập mật khẩu của bạn"
+                                   required />
+                        </div>
+
+                        <div id="accError" class="text-danger small"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Xác nhận</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== Ứng viên đã trúng tuyển ===== -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title mb-0">🎓 Ứng viên đã trúng tuyển</h5>
+                    <span class="text-muted">Tổng UV: @ungVienDatList.Count()</span>
+                </div>
+
+                <div class="input-group input-group-sm mb-3" style="max-width:360px;">
+                    <input type="text"
+                           id="searchInput"
+                           class="form-control"
+                           placeholder="Tìm kiếm ứng viên..." />
+                    <button class="btn btn-outline-secondary"
+                            id="btnSearchUV"
+                            type="button">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+
+                <div class="table-responsive table-frame">
+                    <table id="candidateTable"
+                           class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Họ tên</th>
+                                <th>Email</th>
+                                <th>Vị trí</th>
+                                <th>Phòng ban</th>
+                                <th>KN</th>
+                                <th class="text-center">HĐ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var uv in ungVienDatList)
+                            {
+                                <tr>
+                                    <td>@uv.HoTen</td>
+                                    <td>@uv.Email</td>
+                                    <td>@uv.ViTri</td>
+                                    <td>@uv.ChucVu</td>
+                                    <td>@uv.KinhNghiem năm</td>
+                                    <td class="text-center">
+                                            <button class="btn btn-sm btn-primary"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalThemNhanVien"
+                                                    onclick="fillFromCandidate('@uv.MaUngVien')"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="Thêm nhân viên">
+                                                <i class="bi bi-person-plus"></i>
+                                            </button>
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="mt-2">
+  <small class="text-muted">
+    Hiển thị <span id="uvDisplayCount">@ungVienDatList.Count()</span> / tổng <span>@ungVienDatList.Count()</span>
+  </small>
+</div>
+
+                </div>
+            </div>
+        </div>
+            <!-- Create Modal (thủ công) -->
+            <div class="modal fade" id="modalCreate" tabindex="-1">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content rounded-4 p-4">
+                        <div class="modal-header border-0 mb-3">
+                            <h5 class="modal-title">➕ Thêm nhân viên</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form id="formCreate" method="post" action="@Url.Action("CreateNhanVien","NhanViens")">
+                            <div id="validationSummary" class="text-danger mb-3"></div>
+                            <div class="row g-3">
+                                <!-- Phòng ban: chọn để sinh mã -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Phòng ban</label>
+                                    <select name="PhongBanId" id="inpPhongBan" class="form-select" required>
+                                        <option value="">Chọn phòng ban</option>
+                                        @foreach (var pb in ViewBag.PhongBanList as List<PhongBan>)
+                                        {
+                                            <option value="@pb.Id">@pb.TenPhong</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <!-- Mã nhân viên (readonly) -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Mã nhân viên</label>
+                                    <input name="MaNhanVien" id="inpMaNhanVien" class="form-control" readonly />
+                                </div>
+
+                                <!-- Mã số NV (readonly) -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Mã số NV</label>
+                                    <input name="MaSoNV" id="inpMaSoNV" class="form-control" readonly />
+                                </div>
+
+                            
+
+                                <!-- Các trường nhập tay -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Họ tên</label>
+                                    <input name="HoTen" class="form-control" required />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Ngày sinh</label>
+                                    <input name="NgaySinh" type="date" class="form-control" required />
+                                </div>
+                                <!-- … trong modalCreate, thay input Chức vụ bằng select: -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Chức vụ</label>
+                                    <select id="inpChucVu"
+                                            name="ChucVu"
+                                            class="form-select"
+                                            disabled
+                                            required>
+                                        <option value="">-- Chọn chức vụ --</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input name="Email" type="email" class="form-control" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">SĐT</label>
+                                    <input name="SoDienThoai" class="form-control" />
+                                </div>
+
+                                <!-- Ngày vào công ty mặc định = hôm nay -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Ngày vào công ty</label>
+                                    <input name="NgayVaoCongTy"
+                                           type="date"
+                                           class="form-control"
+                                           required
+                                           value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Kinh nghiệm (năm)</label>
+                                    <input name="KinhNghiem" type="number" min="0" class="form-control" />
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Mô tả</label>
+                                    <textarea name="MoTa" class="form-control"></textarea>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Mức lương</label>
+                                    <input name="MucLuong" type="number" step="0.01" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="mt-4 text-end">
+                                <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-primary">Lưu</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Modal thêm nhân viên từ ứng viên -->
+        <div class="modal fade" id="modalThemNhanVien" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content rounded-4 p-4">
+                    <form id="formCreateNV" method="post" action="@Url.Action("CreateNhanVien","NhanViens")">
+                        <input type="hidden" name="MaUngVien" id="hiddenMaUngVien" />
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">➕ Thêm nhân viên từ ứng viên</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                        </div>
+
+                        <div class="modal-body row g-3">
+                            <!-- Mã NV (readonly) -->
+                            <div class="col-md-6">
+                                <label class="form-label">Mã nhân viên</label>
+                                <input type="text" id="candMaNhanVien" name="MaNhanVien" class="form-control" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mã số NV</label>
+                                <input type="text" id="candMaSoNV" name="MaSoNV" class="form-control" readonly />
+                            </div>
+
+                            <!-- Phòng ban: chọn để sinh mã & đổ chức vụ -->
+                            <div class="col-md-6">
+                                <label class="form-label">Phòng ban</label>
+                                <select id="candPhongBan" name="PhongBanId" class="form-select" required>
+                                    <option value="" disabled selected>-- Chọn phòng ban --</option>
+                                    @foreach (var pb in ViewBag.PhongBanList as List<PhongBan>)
+                                    {
+                                        <option value="@pb.Id">@pb.TenPhong</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Thông tin ứng viên (readonly) -->
+                            <div class="col-md-6">
+                                <label class="form-label">Họ tên</label>
+                                <input type="text" id="candHoTen" name="HoTen" class="form-control" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" id="candEmail" name="Email" class="form-control" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="text" id="candSoDienThoai" name="SoDienThoai" class="form-control" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Ngày sinh</label>
+                                <input type="date" id="candNgaySinh" name="NgaySinh" class="form-control" readonly />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Kinh nghiệm (năm)</label>
+                                <input type="number" id="candKinhNghiem" name="KinhNghiem" class="form-control" readonly />
+                            </div>
+
+                            <!-- Chức vụ: dropdown đổ khi chọn PB -->
+                            <div class="col-md-6">
+                                <label class="form-label">Chức vụ</label>
+                                <select id="candChucVu" name="ChucVu" class="form-select" disabled required>
+                                    <option value="">-- Chọn chức vụ --</option>
+                                </select>
+                            </div>
+
+                            <!-- Mô tả ứng viên (readonly) -->
+                            <div class="col-md-12">
+                                <label class="form-label">Mô tả</label>
+                                <textarea id="candMoTa" name="MoTa" class="form-control" readonly></textarea>
+                            </div>
+
+                            <!-- Ngày vào & Mức lương -->
+                            <div class="col-md-6">
+                                <label class="form-label">Ngày vào công ty</label>
+                                <input type="date"
+                                       id="candNgayVaoCongTy"
+                                       name="NgayVaoCongTy"
+                                       class="form-control"
+                                       required
+                                       value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mức lương</label>
+                                <input type="number" name="MucLuong" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="submit" class="btn btn-primary">Thêm nhân viên</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+            <div aria-live="polite" aria-atomic="true" class="position-relative">
+                <div class="toast-container position-fixed top-0 end-0 p-3">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div id="liveToast" class="toast align-items-center text-bg-success border-0" role="alert"
+                             aria-live="assertive" aria-atomic="true">
+                            <div class="d-flex">
+                                <div class="toast-body">
+                                    @TempData["SuccessMessage"]
+                                </div>
+                                <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                                        data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', () => {
+                              const toastEl = document.getElementById('liveToast');
+                              if (toastEl) {
+                                const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+                                toast.show();
+                              }
+                            });
+                        </script>
+                    }
+                </div>
+            </div>
+
+<!-- ===== Danh sách người dùng ===== -->
+<div class="card mb-4">
+  <div class="card-body">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="card-title mb-0">👤 Danh sách người dùng</h5>
+      <span class="text-muted">
+        Tổng Users: @((ViewBag.Users as List<Nhom6_QLHoSoTuyenDung.Models.Entities.NguoiDung>)?.Count ?? 0)
+      </span>
+    </div>
+
+    <div class="input-group input-group-sm mb-3" style="max-width: 360px;">
+      <input type="text" id="searchUser" class="form-control" placeholder="Tìm kiếm người dùng..." />
+      <button class="btn btn-outline-secondary" id="btnSearchUser" type="button">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+
+    <!-- Cập nhật ở đây: div có cả 2 class -->
+    <div class="table-responsive table-frame">
+      <!-- và table có class table-fixed-header -->
+      <table id="userTable" class="table table-hover mb-0 table-fixed-header">
+        <thead class="table-light">
+          <tr>
+            <th>Username</th>
+            <th>Vai trò</th>
+            <th>Email</th>
+            <th>SDT</th>
+            <th>Ngày tạo</th>
+            <th class="text-center">Nhân Viên</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach (var u in (ViewBag.Users as List<Nhom6_QLHoSoTuyenDung.Models.Entities.NguoiDung>))
+          {
+            <tr>
+              <td>@u.TenDangNhap</td>
+              <td>@u.VaiTro</td>
+              <td>@u.Email</td>
+              <td>@u.SoDienThoai</td>
+              <td>@u.NgayTao?.ToString("dd/MM/yyyy")</td>
+              <td class="text-center">
+                <a asp-controller="NhanViens"
+                   asp-action="Details"
+                   asp-route-id="@u.NhanVienId"
+                   class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-person-lines-fill"></i>
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ===== Filter bảng nhân viên =====
+      const empInput = document.getElementById('searchEmployee'),
+            empBtn   = document.getElementById('btnSearchEmployee'),
+            empRows  = document.querySelectorAll('#employeeTable tbody tr');
+      function filterEmployees() {
+        const kw = empInput.value.trim().toLowerCase();
+        empRows.forEach(r => r.style.display = r.innerText.toLowerCase().includes(kw) ? '' : 'none');
+        document.getElementById('displayCount').textContent =
+          document.querySelectorAll('#employeeTable tbody tr:not([style*="display: none"])').length;
+      }
+                         document.addEventListener("DOMContentLoaded", function () {
+                        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                            new bootstrap.Tooltip(tooltipTriggerEl);
+                        });
+                    });
+
+      empBtn.addEventListener('click', filterEmployees);
+      empInput.addEventListener('keyup', e => { if (e.key === 'Enter') filterEmployees(); });
+
+
+
+      const uvInput = document.getElementById('searchInput'),
+      uvBtn   = document.getElementById('btnSearchUV'),
+      uvRows  = document.querySelectorAll('#candidateTable tbody tr');
+
+function filterCandidates() {
+  const kw = uvInput.value.trim().toLowerCase();
+  let visibleCount = 0;
+  uvRows.forEach(row => {
+    const match = row.innerText.toLowerCase().includes(kw);
+    row.style.display = match ? '' : 'none';
+    if (match) visibleCount++;
+  });
+
+  // Cập nhật số lượng hiển thị
+  const display = document.getElementById('uvDisplayCount');
+if (display) display.textContent = visibleCount;
+
+}
+
+uvBtn.addEventListener('click', filterCandidates);
+uvInput.addEventListener('keyup', e => {
+  if (e.key === 'Enter') filterCandidates();
+});
+
+      // ===== Filter bảng người dùng =====
+      const userInput = document.getElementById('searchUser'),
+            userBtn   = document.getElementById('btnSearchUser'),
+            userRows  = document.querySelectorAll('#userTable tbody tr');
+      function filterUsers() {
+        const kw = userInput.value.trim().toLowerCase();
+        userRows.forEach(r => r.style.display = r.innerText.toLowerCase().includes(kw) ? '' : 'none');
+      }
+      userBtn.addEventListener('click', filterUsers);
+      userInput.addEventListener('keyup', e => { if (e.key === 'Enter') filterUsers(); });
+
+      // ===== Sinh mã NV & mã số NV & đổ chức vụ =====
+      const roleMap = {
+        PBDA: ['Trưởng phòng Phân tích Dữ liệu','Chuyên viên BI','Chuyên viên Phân tích Dữ liệu','Nhân viên Nhập liệu'],
+        PBIT: ['Trưởng phòng IT','Lập trình viên Backend','Lập trình viên Frontend','Nhân viên Hỗ trợ kỹ thuật','Nhân viên Quản trị mạng','Tester / QA'],
+        PBKD: ['Trưởng phòng Kinh doanh','Nhân viên Kinh doanh','Chuyên viên Phát triển Thị trường','Chuyên viên Chăm sóc Khách hàng','Telesales'],
+        PBKT: ['Trưởng phòng Kế toán','Kế toán Tổng hợp','Kế toán Thanh toán','Kế toán Kho / Công nợ','Nhân viên Tài chính – Kế toán'],
+        PBNS: ['Trưởng phòng Nhân sự','Chuyên viên Tuyển dụng','Chuyên viên C&B','Chuyên viên Đào tạo & Phát triển','Nhân viên Hành chính – Nhân sự']
+      };
+      async function genCodes(pbField, outMaId, outSoId) {
+        const pb = document.getElementById(pbField).value;
+        const maEl = document.getElementById(outMaId),
+              soEl = document.getElementById(outSoId);
+        if (!pb) {
+          maEl.value = soEl.value = '';
+          return;
+        }
+        const res = await fetch(`@Url.Action("GenerateCodes","NhanViens")?phongBanId=${pb}`),
+              j   = await res.json();
+        maEl.value = j.maNV;
+        soEl.value = j.maSoNV;
+      }
+      [['inpPhongBan','inpMaNhanVien','inpMaSoNV','inpChucVu'],
+       ['candPhongBan','candMaNhanVien','candMaSoNV','candChucVu']]
+      .forEach(([field, ma, so, cv]) => {
+        document.getElementById(field)?.addEventListener('change', e => {
+          genCodes(field, ma, so);
+          const sel = document.getElementById(cv);
+          sel.disabled = false;
+          sel.innerHTML = '<option value="">-- Chọn chức vụ --</option>';
+          (roleMap[e.target.value]||[]).forEach(r => sel.add(new Option(r, r)));
+        });
+      });
+
+      // ===== Fill dữ liệu từ ứng viên vào modal =====
+      window.fillFromCandidate = async uvId => {
+        if (!uvId) return;
+        document.getElementById('hiddenMaUngVien').value = uvId;
+        ['candMaNhanVien','candMaSoNV','candPhongBan','candHoTen','candEmail','candSoDienThoai','candNgaySinh','candKinhNghiem','candMoTa']
+          .forEach(id => document.getElementById(id).value = '');
+        const roleSel = document.getElementById('candChucVu');
+        roleSel.disabled = true;
+        roleSel.innerHTML = '<option value="">-- Chọn chức vụ --</option>';
+        const res = await fetch(`@Url.Action("GetCandidate","NhanViens")?id=${uvId}`),
+              j   = await res.json();
+        if (!j.success) return;
+        document.getElementById('candHoTen').value = j.ten;
+        document.getElementById('candEmail').value = j.email;
+        document.getElementById('candSoDienThoai').value = j.sdt;
+        document.getElementById('candNgaySinh').value = j.ngaysinh;
+        document.getElementById('candKinhNghiem').value = parseInt(j.kinhn) || 0;
+        document.getElementById('candMoTa').value = j.mota;
+        new bootstrap.Modal(document.getElementById('modalThemNhanVien')).show();
+      };
+
+      // ===== AJAX thêm nhân viên từ UV =====
+      document.getElementById('formCreateNV')?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const res = await fetch(e.target.action, { method:'POST', body:new FormData(e.target) }),
+              j   = await res.json();
+                           if (j.success) {
+                        alert(j.message || "Thêm nhân viên thành công!");
+                        location.reload();
+                    }
+
+        else alert('Lỗi:\n' + (j.errors?.join('\n') || j.message));
+      });
+
+      // ===== Reset filter =====
+      document.getElementById('btnReset').onclick = () => {
+        location.href = '@Url.Action("Index","NhanViens")';
+      };
+
+      // ===== Modal Tạo TK =====
+      const modalAcc = document.getElementById('modalCreateAccount');
+      modalAcc?.addEventListener('show.bs.modal', e => {
+        const id = e.relatedTarget.getAttribute('data-nvid');
+        document.getElementById('accMaNhanVien').value = id;
+        document.getElementById('accRole').value = '';
+        document.getElementById('accPassword').value = '';
+        document.getElementById('accError').textContent = '';
+      });
+      document.getElementById('formCreateAccount')?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const res = await fetch(e.target.action, { method:'POST', body:new FormData(e.target) }),
+              j   = await res.json();
+        if (j.success) {
+          bootstrap.Modal.getInstance(modalAcc).hide();
+          alert('Tạo tài khoản thành công');
+          location.reload();
+        } else {
+          document.getElementById('accError').textContent = j.message || 'Đã có lỗi.';
+        }
+      });
+
+      // ===== AJAX tạo thủ công =====
+      document.getElementById('formCreate')?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const res = await fetch(e.target.action, { method:'POST', body:new FormData(e.target) }),
+              j   = await res.json();
+        if (j.success) {
+          bootstrap.Modal.getInstance(document.getElementById('modalCreate')).hide();
+          location.reload();
+        } else {
+          document.getElementById('validationSummary').textContent = j.errors.join('\n');
+        }
+      });
+
+      // ===== Chart.js initialization =====
+      const cols    = @Html.Raw(JsonSerializer.Serialize(pbColors)),
+            rawD   = @Html.Raw(JsonSerializer.Serialize(rawDates)),
+            deptL  = @Html.Raw(JsonSerializer.Serialize(pbLabels)),
+            deptC  = @Html.Raw(JsonSerializer.Serialize(pbCounts)),
+            ages   = @Html.Raw(JsonSerializer.Serialize(ageList)),
+            grpRole= @Html.Raw(JsonSerializer.Serialize(
+                      Model.GroupBy(n => n.ChucVu ?? "Unknown")
+                           .Select(g => new { label = g.Key, count = g.Count() })
+                           .ToList())),
+            grpMaj = @Html.Raw(JsonSerializer.Serialize(
+                      Model.GroupBy(n => n.MoTa ?? "Unknown")
+                           .Select(g => new { label = g.Key, count = g.Count() })
+                           .ToList())),
+            expArr = @Html.Raw(JsonSerializer.Serialize(
+    Model.Select(n => {
+        var txt = (n.KinhNghiem ?? "0").Split(' ')[0];
+        return int.TryParse(txt, out var v) ? v : 0;
+    }).ToList()));
+
+
+      // (1) Growth line chart
+      const ctxG = document.getElementById('chartTangTruong').getContext('2d'),
+            chartG = new Chart(ctxG, {
+              type: 'line',
+              data: {
+                labels: [],
+                datasets: [{ label: 'Số NV', data: [], borderColor: cols[0], fill: false, tension: 0.3 }]
+              },
+              options: { responsive: true }
+            });
+      function renderGrowth(mode) {
+        const o = {};
+        rawD.forEach(d => {
+          const [y,m] = d.split('-').map(Number),
+                key = mode === 'Quý'
+                      ? `${y}-Q${Math.floor((m-1)/3)+1}`
+                      : mode === 'Năm'
+                        ? `${y}`
+                        : d;
+          o[key] = (o[key]||0) + 1;
+        });
+        const labels = Object.keys(o).sort();
+        chartG.data.labels = labels;
+        chartG.data.datasets[0].data = labels.map(l => o[l]);
+        chartG.update();
+      }
+      renderGrowth('Năm');
+      document.getElementById('growthMode').addEventListener('change', e => renderGrowth(e.target.value));
+
+      // (2) Phòng ban
+new Chart(document.getElementById('chartPhongBan').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: deptL,
+    datasets: [{
+      data: deptC,
+      backgroundColor: cols
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          boxWidth: 12,
+          padding: 15
+        }
+      }
+    },
+    cutout: '60%'
+  }
+});
+
+
+
+      // (3) Chức vụ
+      new Chart(document.getElementById('chartChucVu').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+          labels: grpRole.map(x => x.label),
+          datasets: [{ data: grpRole.map(x => x.count), backgroundColor: cols }]
+        },
+        options: { responsive: true, cutout: '50%', plugins: { legend: { display: false } } }
+      });
+       
+
+      // (4) Độ tuổi
+      // (3) Độ tuổi - cải tiến
+{
+  const bins = ['<25','25-30','31-35','36-40','41+'];
+  const counts = bins.map(b =>
+    b === '41+'
+      ? ages.filter(a => a >= 41).length
+      : ages.filter(a => {
+          const [min, max] = b.split('-').map(Number);
+          return a >= min && a <= max;
+        }).length
+  );
+
+  new Chart(document.getElementById('chartDoTuoi').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: bins,
+      datasets: [{
+        label: 'Số nhân viên',
+        data: counts,
+        backgroundColor: cols,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        title: { display: false }, // ✅ Bỏ tiêu đề
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.dataset.label}: ${ctx.raw}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Độ tuổi'
+          }
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Số lượng'
+          },
+          ticks: {
+            precision: 0
+          }
+        }
+      }
+    }
+  });
+}
+
+
+       
+     // (5) Kinh nghiệm
+{
+  const labels = ['1-2', '3-5', '6-8', '>8'];
+  const data = [
+    expArr.filter(x => x >= 1 && x <= 2).length,
+    expArr.filter(x => x >= 3 && x <= 5).length,
+    expArr.filter(x => x >= 6 && x <= 8).length,
+    expArr.filter(x => x > 8).length
+  ];
+
+  new Chart(document.getElementById('chartKinhNghiem').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: cols
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '60%',
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+}
+
+        
+// (X) Biểu đồ Vai trò cố định
+      const roleLabels = @Html.Raw(JsonSerializer.Serialize(roleLabels));
+      const roleCounts = @Html.Raw(JsonSerializer.Serialize(roleCounts));
+      const ctxVT = document.getElementById('chartVaiTro').getContext('2d');
+      new Chart(ctxVT, {
+        type: 'doughnut',
+        data: {
+          labels: roleLabels,
+          datasets: [{
+            data: roleCounts,
+            backgroundColor: ['#36A2EB','#FF6384','#FFCE56']
+          }]
+        },
+        options: {
+          responsive: true,
+          cutout: '60%',
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    });
+    </script>
+}

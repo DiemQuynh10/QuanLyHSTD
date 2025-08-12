@@ -1,0 +1,217 @@
+﻿@using Nhom6_QLHoSoTuyenDung.Models.ViewModels.NguoiPhongVanVM
+@model List<DaPhongVanVM>
+
+@{
+    ViewData["Title"] = "Trạng thái chờ (HR)";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (!User.Identity?.IsAuthenticated ?? true)
+{
+    <script>
+        Swal.fire({
+            icon: "warning",
+            title: "Phiên đăng nhập đã hết!",
+            text: "Vui lòng đăng nhập lại.",
+        }).then(() => {
+            window.location.href = "/NguoiDungs/DangNhap";
+        });
+    </script>
+    return;
+}
+
+<div class="container-fluid px-4 mt-4">
+    <h3 class="fw-bold text-primary">
+        <i class="bi bi-hourglass-split me-2"></i> Ứng viên cần phỏng vấn lần 2
+    </h3>
+    <p class="text-muted mb-4">
+        Danh sách ứng viên đã được đánh giá và được đề xuất tham gia vòng phỏng vấn tiếp theo
+    </p>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col h-100">
+                <div class="card shadow-sm border-0 rounded-4 h-100 d-flex flex-column">
+                    <div class="card-body d-flex flex-column gap-3 flex-grow-1">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h5 class="fw-bold">@item.TenUngVien</h5>
+                                <div class="text-muted">@item.Email</div>
+                                <div class="text-secondary">@item.ViTri</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="badge bg-info text-white mb-1">Chờ vòng 2</div>
+                                <div class="fs-4 text-success fw-bold">
+                                    @(item.DiemTB.HasValue ? item.DiemTB.Value.ToString("0.0") : "–")
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="small text-muted">
+                            <i class="bi bi-calendar-event me-1"></i> @item.ThoiGian.ToString("dd/MM/yyyy HH:mm")
+                        </div>
+
+                        <div class="comment-placeholder" style="min-height: 45px;">
+                            @if (!string.IsNullOrEmpty(item.NhanXet))
+                            {
+                                <div class="bg-light p-2 rounded small h-100">
+                                    <i class="bi bi-chat-left-quote-fill text-primary me-1"></i>
+                                    <span class="fst-italic">"@item.NhanXet"</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mt-auto d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-success"
+                                    data-ungvien-id="@item.UngVienId"
+                                    onclick="moFormTaoLich('@item.UngVienId')">
+                                📅 Sắp xếp lịch vòng 2
+                            </button>
+
+                            @if (!string.IsNullOrEmpty(@item.LinkCV))
+                            {
+                                <button class="btn btn-sm btn-outline-danger"
+                                        onclick="xemCV('@Url.Content(@item.LinkCV)')"
+                                        data-bs-toggle="tooltip" title="Xem CV ứng viên">
+                                    <i class="bi bi-file-pdf-fill"></i>
+                                </button>
+                            }
+
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal tạo lịch phỏng vấn -->
+<div class="modal fade" id="modalTaoLich" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tạo lịch phỏng vấn vòng 2</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Nội dung form sẽ được load bằng Ajax -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test modal xem CV -->
+<div class="modal fade" id="cvModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xem CV</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="cvViewer" width="100%" height="600px" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function moFormTaoLich(ungVienId) {
+            $.ajax({
+                url: '/LichPhongVans/FormTaoLichVong2',
+                data: { ungVienId },
+                type: 'GET',
+                success: function (res) {
+                    if (res?.error && res?.message) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Phiên đăng nhập đã hết!',
+                            text: res.message,
+                            confirmButtonText: 'Đăng nhập lại',
+                        }).then(() => {
+                            window.location.href = "/NguoiDungs/DangNhap";
+                        });
+                        return;
+                    }
+
+                    $('#modalTaoLich .modal-body').html(res);
+                    $('#modalTaoLich').modal('show');
+                },
+                error: function (xhr) {
+                    try {
+                        var json = JSON.parse(xhr.responseText);
+                        if (json.error && json.message) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Phiên đăng nhập đã hết!',
+                                text: json.message,
+                                confirmButtonText: 'Đăng nhập lại',
+                            }).then(() => {
+                                window.location.href = "/NguoiDungs/DangNhap";
+                            });
+                            return;
+                        }
+                    } catch (e) {}
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: xhr.responseText || 'Không thể tạo lịch!',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+
+        // Submit form tạo lịch bằng Ajax
+        $(document).on('submit', '#formTaoLich', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            $.post(form.attr('action'), form.serialize(), function (res) {
+                if (res.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công',
+                        text: res.message || 'Tạo lịch thành công!',
+                        confirmButtonText: 'OK'
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: res.message || 'Không thể tạo lịch!',
+                        confirmButtonText: 'Thử lại'
+                    });
+                }
+            }).fail(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi mạng',
+                    text: 'Không thể gửi yêu cầu đến server.',
+                    confirmButtonText: 'OK'
+                });
+            });
+        });
+
+        // Xem CV (dùng modal iframe)
+               function xemCV(link) {
+            const viewer = document.getElementById("cvViewer");
+            viewer.src = link;
+            const modal = new bootstrap.Modal(document.getElementById('cvModal'));
+            modal.show();
+        }
+                $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+
+    </script>
+}

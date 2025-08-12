@@ -1,4 +1,4 @@
-﻿using Nhom6_QLHoSoTuyenDung.Models;
+﻿using Nhom6_QLHoSoTuyenDung.Models.Entities;
 
 namespace Nhom6_QLHoSoTuyenDung.Data
 {
@@ -7,6 +7,8 @@ namespace Nhom6_QLHoSoTuyenDung.Data
         public static void Seed(AppDbContext context)
         {
             if (context.PhongPhongVans.Any()) return;
+
+            var now = new DateTime(2025, 1, 15);
 
             var dsPhong = new List<PhongPhongVan>
             {

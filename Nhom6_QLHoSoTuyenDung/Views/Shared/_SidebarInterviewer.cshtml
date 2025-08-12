@@ -1,0 +1,32 @@
+﻿@{
+    var ctrl = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLower();
+    var act = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower();
+    string A(string c, string? a = null) => c == ctrl && (a == null || a == act) ? "active" : "";
+}
+<nav class="nav flex-column">
+    <a asp-controller="InterviewerDashboard" asp-action="Index"
+       class="nav-link @A("interviewerdashboard", "index")">
+        <i class="bi bi-grid-fill me-2"></i> Tổng quan
+    </a>
+
+    <a asp-controller="InterviewerDashboard" asp-action="LichPhongVan"
+       class="nav-link @A("interviewerdashboard", "lichphongvan")">
+        <i class="bi bi-calendar2-event-fill me-2"></i> Lịch phỏng vấn
+    </a>
+
+    <a asp-controller="InterviewerDashboard" asp-action="LichSuPhongVan"
+       class="nav-link @A("interviewerdashboard", "lichsuphongvan")">
+        <i class="bi bi-clock-history me-2"></i> Lịch sử
+    </a>
+
+    <a asp-controller="InterviewerDashboard" asp-action="TrangThaiCho"
+       class="nav-link @A("interviewerdashboard", "trangthaicho")">
+        <i class="bi bi-check2-square me-2"></i> Trạng thái chờ
+    </a>
+
+
+    <a asp-controller="CaiDat" asp-action="Index"
+       class="nav-link @A("caidat")">
+        <i class="bi bi-gear-fill me-2"></i> Cài đặt
+    </a>
+</nav>
