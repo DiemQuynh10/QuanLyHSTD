@@ -36,42 +36,23 @@ This project supports the internal recruitment process, including candidate mana
 
 ## Screenshots
 
-### Login Page
+![Login Page](Nhom6_QLHoSoTuyenDung/screenshots/login.png)
 
-![Login Page](screenshots/login.png)
+![Admin Dashboard](Nhom6_QLHoSoTuyenDung/screenshots/admin-dashboard.png)
 
-### Admin Dashboard
+![Candidate Management](Nhom6_QLHoSoTuyenDung/screenshots/candidate-management.png)
 
-![Admin Dashboard](screenshots/admin-dashboard.png)
+![Recruitment Position Management](Nhom6_QLHoSoTuyenDung/screenshots/recruitment-positions.png)
 
-### Candidate Management
+![Interview Management](Nhom6_QLHoSoTuyenDung/screenshots/interview-managemen.png)
 
-![Candidate Management](screenshots/candidate-management.png)
+![HR Waiting List](Nhom6_QLHoSoTuyenDung/screenshots/hr-waiting-list.png)
 
-### Recruitment Position Management
+![Reports and Statistics](Nhom6_QLHoSoTuyenDung/screenshots/reports.png)
 
-![Recruitment Position Management](screenshots/recruitment-positions.png)
+![Employee Management](Nhom6_QLHoSoTuyenDung/screenshots/employee-management.png)
 
-### Interview Management
-
-![Interview Management](screenshots/interview-management.png)
-
-### HR Waiting List
-
-![HR Waiting List](screenshots/hr-waiting-list.png)
-
-### Reports and Statistics
-
-![Reports and Statistics](screenshots/reports.png)
-
-### Employee Management
-
-![Employee Management](screenshots/employee-management.png)
-
-### Interviewer Dashboard
-
-![Interviewer Dashboard](screenshots/interviewer-dashboard.png)
-
+![Interviewer Dashboard](Nhom6_QLHoSoTuyenDung/screenshots/interviewer-dashboard.png)
 ## Project Status
 
 This project was developed as a university project and is currently being improved for portfolio purposes.
