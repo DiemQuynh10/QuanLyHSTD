@@ -1,249 +1,229 @@
-![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-6.0-blue)
-![SQL Server](https://img.shields.io/badge/SQL_Server-Database-red)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5-purple)
-![Status](https://img.shields.io/badge/Project-Completed-success)
-# 🚀 CyberFortis - Recruitment Management System
+# CyberFortis - Recruitment Management System
 
-> Hệ thống quản lý hồ sơ tuyển dụng nội bộ được phát triển bằng ASP.NET Core MVC và SQL Server, hỗ trợ doanh nghiệp quản lý toàn bộ quy trình tuyển dụng từ tiếp nhận hồ sơ đến đánh giá và báo cáo thống kê.
+CyberFortis is a web-based recruitment management system developed using ASP.NET Core MVC and SQL Server. The application helps Human Resources departments manage candidates, recruitment positions, interviews, employee accounts, and recruitment reports in a centralized platform.
 
 ---
 
-## 📋 Project Information
+## Project Overview
 
-| Information | Details |
-|------------|------------|
+This project was developed as a graduation project to apply software engineering principles and modern web development technologies in a real-world recruitment management scenario.
+
+### Project Information
+
+| Item         | Description                               |
+| ------------ | ----------------------------------------- |
 | Project Name | CyberFortis Recruitment Management System |
-| Project Type | Graduation Project |
-| Team Size | 3 Members |
-| Role | Full Stack Developer |
-| Framework | ASP.NET Core MVC |
-| Database | SQL Server |
-| Development Tool | Visual Studio 2022 |
+| Project Type | Graduation Project                        |
+| Team Size    | 4 Members                                 |
+| Role         | Full Stack Developer                      |
+| Framework    | ASP.NET Core MVC                          |
+| Database     | SQL Server                                |
+| IDE          | Visual Studio 2022                        |
 
 ---
 
-## 🎯 Main Features
+## Features
 
-### 👨‍💼 Candidate Management
-- Add, update, delete candidate profiles
-- Search and filter candidates
-- Track recruitment status
-- Manage candidate information
+### Candidate Management
 
-### 📌 Recruitment Position Management
-- Create recruitment positions
-- Manage hiring quantity
-- Track recruitment progress
-- Manage job requirements
+* Add, edit, and delete candidate records
+* Search and filter candidates
+* Track recruitment status
+* Manage candidate profiles
 
-### 🎤 Interview Management
-- Schedule interviews
-- Manage interview calendars
-- Track interview results
-- Assign interviewers
+### Recruitment Position Management
 
-### 📝 Candidate Evaluation
-- Evaluate candidates
-- Score interview criteria
-- Store interviewer comments
-- Recommend recruitment decisions
+* Create and manage recruitment positions
+* Track hiring requirements
+* Monitor recruitment progress
 
-### 👥 Employee Management
-- Manage employee accounts
-- User authorization
-- Manage departments and roles
+### Interview Management
 
-### 📊 Statistics & Reports
-- Candidate statistics
-- Recruitment performance reports
-- Recruitment source analysis
-- Interactive dashboard visualization
+* Schedule interviews
+* Manage interview calendars
+* Track interview results
 
-### 🔐 Authentication & Authorization
-- Login / Logout
-- Forgot Password
-- Role-Based Access Control
-- Admin / HR / Interviewer permissions
+### Candidate Evaluation
+
+* Evaluate candidates after interviews
+* Store interview feedback
+* Support recruitment decisions
+
+### Employee Management
+
+* Manage employee accounts
+* Manage roles and permissions
+* Update employee information
+
+### Reports and Statistics
+
+* Candidate statistics
+* Recruitment performance reports
+* Candidate source analysis
+* Dashboard charts and visualizations
+
+### Authentication and Authorization
+
+* User login and logout
+* Role-based authorization
+* Admin, HR, and Interviewer access control
 
 ---
 
-## 🛠 Technologies Used
+## Technology Stack
 
 ### Backend
-- ASP.NET Core MVC
-- Entity Framework Core
-- LINQ
-- Dependency Injection
+
+* ASP.NET Core MVC
+* Entity Framework Core
+* LINQ
+* Dependency Injection
 
 ### Frontend
-- HTML5
-- CSS3
-- Bootstrap 5
-- JavaScript
-- jQuery
+
+* HTML
+* CSS
+* Bootstrap 5
+* JavaScript
+* jQuery
 
 ### Database
-- SQL Server
+
+* SQL Server
 
 ### Visualization
-- Chart.js
+
+* Chart.js
 
 ### Version Control
-- Git
-- GitHub
+
+* Git
+* GitHub
 
 ---
 
-## 🗄 Database Overview
+## Database Structure
 
-Main entities:
+The main entities in the system include:
 
-- NguoiDung
-- NhanVien
-- UngVien
-- ViTriTuyenDung
-- LichPhongVan
-- DanhGiaPhongVan
-- PhongBan
-- VaiTro
+* NguoiDung
+* NhanVien
+* UngVien
+* ViTriTuyenDung
+* LichPhongVan
+* DanhGiaPhongVan
+* PhongBan
+* VaiTro
 
-The system uses a relational database model to manage recruitment and employee information.
+The database is designed using a relational model to support the recruitment workflow.
 
 ---
 
-# 📷 System Screenshots
+## System Screenshots
 
-## 🔐 Login Page
+### Login Page
 
 ![Login](Nhom6_QLHoSoTuyenDung/screenshots/login.png)
 
-User authentication and authorization page.
+User authentication page.
 
 ---
 
-## 📊 Admin Dashboard
+### Admin Dashboard
 
 ![Admin Dashboard](Nhom6_QLHoSoTuyenDung/screenshots/admin-dashboard.png)
 
-Features:
-
-- Overview statistics
-- Candidate tracking
-- Recruitment status monitoring
-- Dashboard charts and analytics
+Overview dashboard showing recruitment statistics and system activity.
 
 ---
 
-## 👨‍💼 Candidate Management
+### Candidate Management
 
 ![Candidate Management](Nhom6_QLHoSoTuyenDung/screenshots/candidate-management.png)
 
-Features:
-
-- Add candidate
-- Edit information
-- Search and filter
-- Recruitment status tracking
+Manage candidate information and recruitment status.
 
 ---
 
-## 📌 Recruitment Position Management
+### Recruitment Position Management
 
 ![Recruitment Positions](Nhom6_QLHoSoTuyenDung/screenshots/recruitment-positions.png)
 
-Features:
-
-- Create positions
-- Manage hiring quantity
-- Track recruitment progress
+Manage recruitment positions and hiring requirements.
 
 ---
 
-## 🎤 Interview Management
+### Interview Management
 
 ![Interview Management](Nhom6_QLHoSoTuyenDung/screenshots/interview-management.png)
 
-Features:
-
-- Schedule interviews
-- Manage interview results
-- Track interview activities
+Schedule interviews and manage interview activities.
 
 ---
 
-## ⏳ HR Waiting List
+### HR Waiting List
 
 ![HR Waiting List](Nhom6_QLHoSoTuyenDung/screenshots/hr-waiting-list.png)
 
-Displays candidates waiting for HR review or approval.
+Display candidates waiting for HR review.
 
 ---
 
-## 👥 Employee Management
+### Employee Management
 
 ![Employee Management](Nhom6_QLHoSoTuyenDung/screenshots/employee-management.png)
 
-Features:
-
-- Employee account management
-- Role management
-- Department management
+Manage employee accounts and system permissions.
 
 ---
 
-## 📈 Reports & Analytics
+### Reports and Statistics
 
 ![Reports](Nhom6_QLHoSoTuyenDung/screenshots/reports.png)
 
-Statistics:
-
-- Recruitment efficiency
-- Candidate sources
-- Conversion rate
-- Recruitment reports
+View recruitment reports and analytics.
 
 ---
 
-## 🎯 Interviewer Dashboard
+### Interviewer Dashboard
 
 ![Interviewer Dashboard](Nhom6_QLHoSoTuyenDung/screenshots/interviewer-dashboard.png)
 
-Features:
-
-- View interview schedules
-- Evaluate candidates
-- Monitor interview outcomes
+Workspace for interviewers to manage interviews and evaluations.
 
 ---
 
-## 🔐 User Roles
+## User Roles
 
-### 👑 Admin
-- Manage entire system
-- Manage employees
-- View reports and statistics
+### Administrator
 
-### 👨‍💼 HR
-- Manage candidates
-- Manage recruitment positions
-- Schedule interviews
+* Manage the entire system
+* Manage employee accounts
+* View reports and statistics
 
-### 🎤 Interviewer
-- View assigned interviews
-- Evaluate candidates
-- Submit interview results
+### HR
+
+* Manage candidates
+* Manage recruitment positions
+* Schedule interviews
+
+### Interviewer
+
+* View assigned interviews
+* Evaluate candidates
+* Submit interview feedback
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 ### Clone Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/QuanLyHSTD.git
+git clone https://github.com/DiemQuynh10/QuanLyHSTD.git
 ```
 
-### Restore Packages
+### Restore Dependencies
 
 ```bash
 dotnet restore
@@ -255,7 +235,7 @@ dotnet restore
 Update-Database
 ```
 
-### Run Project
+### Run Application
 
 ```bash
 dotnet run
@@ -263,22 +243,22 @@ dotnet run
 
 ---
 
-## 📚 Learning Outcomes
+## Learning Outcomes
 
-Through this project, the team practiced:
+This project provided practical experience in:
 
-- ASP.NET Core MVC Architecture
-- Entity Framework Core
-- Authentication & Authorization
-- Database Design
-- Dashboard Development
-- Data Visualization with Chart.js
-- Team Collaboration using Git & GitHub
+* ASP.NET Core MVC development
+* Entity Framework Core
+* Authentication and Authorization
+* Database Design
+* Dashboard Development
+* Data Visualization with Chart.js
+* Team Collaboration using Git and GitHub
 
 ---
 
-## 👨‍💻 Author
+## Authors
 
 CyberFortis Recruitment Management Team
 
-Graduation Project – Information Technology
+Information Technology Graduation Project
