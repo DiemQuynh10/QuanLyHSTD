@@ -1,67 +1,115 @@
-# 📘 HƯỚNG DẪN LÀM VIỆC VỚI GITHUB DÀNH CHO CÁC THÀNH VIÊN NHÓM 6
+# Team Git Workflow Guide
 
-## ✅ 1. Clone Project (nếu chưa làm)
+This document describes the Git workflow used during the development of the CyberFortis Recruitment Management System project.
 
-git clone https://github.com/DiemQuynh10/Nhom6_DoAn1_QuanLyHoSoTuyenDung.git
-cd Nhom6_DoAn1_QuanLyHoSoTuyenDung
+## Repository Structure
 
+The project follows a simple branching strategy:
 
-## ✅ 2. Nếu đã clone từ trước → cập nhật các nhánh mới
-
----
-git fetch origin
----
-→ Kiểm tra có các nhánh `feature/minh`, `feature/quynh`, `feature/van`, `dev`, `main`.
-
-
-
-## ✅ 3. Chuyển sang đúng nhánh của bạn để làm việc
-
-| Thành viên               | Nhánh làm việc         |
-|--------------------------|------------------------|
-| Đỗ Công Minh             | `feature/minh`         |
-| Đinh Thị Diễm Quỳnh      | `feature/quynh`        |
-| Trần Thị Thanh Vân       | `feature/van`          |
-
-🔸 Ví dụ: Quỳnh làm thì chạy:
-
----
-git checkout feature/quynh
----
-
-## ✅ 4. Sau khi sửa code → đẩy lên GitHub
-
----
-git add .
-git commit -m "Mô tả ngắn về phần bạn đã làm"
-git push origin feature/tenban
----
-
-📌 Thay `tenban` bằng `quynh`, `van`, hoặc `minh`.
-
-
-## ✅ 5. Tạo Pull Request (PR)
-
-1. Lên GitHub repo
-2. Chọn tab **Pull Requests → New Pull Request**
-3. Chọn:
-   - **base:** `dev`
-   - **compare:** `feature/tenban`
-4. Nhấn **Create Pull Request**
-
-Trưởng nhóm sẽ kiểm tra và hợp nhất vào nhánh `dev`.
+| Branch    | Purpose                             |
+| --------- | ----------------------------------- |
+| main      | Stable production-ready source code |
+| dev       | Integration branch for development  |
+| feature/* | Individual feature development      |
 
 ---
 
-## 🚨 Lưu ý
+## Getting Started
 
-- ❌ Không làm việc trực tiếp trên `main`
-- ✅ Luôn `checkout` đúng nhánh trước khi code
-- ✅ Nếu repo có thay đổi, hãy cập nhật:
+Clone the repository:
+
+```bash
+git clone https://github.com/DiemQuynh10/QuanLyHSTD.git
+cd QuanLyHSTD
+```
+
 ---
+
+## Sync Latest Changes
+
+Before starting any task, update the latest code from the development branch:
+
+```bash
+git checkout dev
 git pull origin dev
+```
+
+Then switch to your working branch:
+
+```bash
+git checkout feature/your-branch
 git merge dev
+```
+
 ---
 
+## Commit Changes
 
-**🎯 Chúc các bạn làm việc hiệu quả!**
+After completing a task:
+
+```bash
+git add .
+git commit -m "Describe completed work"
+```
+
+Examples:
+
+```bash
+git commit -m "Add candidate filtering"
+git commit -m "Update interview dashboard"
+git commit -m "Fix login validation"
+```
+
+---
+
+## Push Changes
+
+Push your branch to GitHub:
+
+```bash
+git push origin feature/your-branch
+```
+
+---
+
+## Pull Request Process
+
+1. Create a Pull Request.
+2. Set:
+
+   * Base branch: `dev`
+   * Compare branch: your feature branch.
+3. Submit the Pull Request for review.
+4. Merge only after approval.
+
+---
+
+## Development Rules
+
+* Do not commit directly to `main`.
+* Pull the latest changes before starting work.
+* Keep commits small and meaningful.
+* Use clear commit messages.
+* Test changes before creating a Pull Request.
+
+---
+
+## Recommended Workflow
+
+```bash
+git checkout dev
+git pull origin dev
+
+git checkout feature/your-branch
+git merge dev
+
+# Development
+
+git add .
+git commit -m "Describe completed work"
+git push origin feature/your-branch
+```
+
+---
+
+CyberFortis Recruitment Management Team
