@@ -1,3 +1,7 @@
+![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-6.0-blue)
+![SQL Server](https://img.shields.io/badge/SQL_Server-Database-red)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-purple)
+![Status](https://img.shields.io/badge/Project-Completed-success)
 # 🚀 CyberFortis - Recruitment Management System
 
 > Hệ thống quản lý hồ sơ tuyển dụng nội bộ được phát triển bằng ASP.NET Core MVC và SQL Server, hỗ trợ doanh nghiệp quản lý toàn bộ quy trình tuyển dụng từ tiếp nhận hồ sơ đến đánh giá và báo cáo thống kê.
@@ -10,7 +14,7 @@
 |------------|------------|
 | Project Name | CyberFortis Recruitment Management System |
 | Project Type | Graduation Project |
-| Team Size | 4 Members |
+| Team Size | 3 Members |
 | Role | Full Stack Developer |
 | Framework | ASP.NET Core MVC |
 | Database | SQL Server |
