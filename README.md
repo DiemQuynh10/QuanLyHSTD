@@ -1,127 +1,280 @@
-# 🚀 CyberFortis - Hệ Thống Quản Lý Hồ Sơ Tuyển Dụng
+# 🚀 CyberFortis - Recruitment Management System
 
-Hệ thống quản lý tuyển dụng nội bộ được phát triển bằng ASP.NET Core MVC và SQL Server.
+> Hệ thống quản lý hồ sơ tuyển dụng nội bộ được phát triển bằng ASP.NET Core MVC và SQL Server, hỗ trợ doanh nghiệp quản lý toàn bộ quy trình tuyển dụng từ tiếp nhận hồ sơ đến đánh giá và báo cáo thống kê.
 
-## 📌 Chức năng chính
+---
 
-- Quản lý ứng viên
-- Quản lý vị trí tuyển dụng
-- Quản lý lịch phỏng vấn
-- Đánh giá ứng viên
-- Quản lý nhân viên
-- Thống kê và báo cáo
-- Phân quyền Admin / HR / Interviewer
+## 📋 Project Information
 
-## 🛠 Công nghệ sử dụng
+| Information | Details |
+|------------|------------|
+| Project Name | CyberFortis Recruitment Management System |
+| Project Type | Graduation Project |
+| Team Size | 4 Members |
+| Role | Full Stack Developer |
+| Framework | ASP.NET Core MVC |
+| Database | SQL Server |
+| Development Tool | Visual Studio 2022 |
 
+---
+
+## 🎯 Main Features
+
+### 👨‍💼 Candidate Management
+- Add, update, delete candidate profiles
+- Search and filter candidates
+- Track recruitment status
+- Manage candidate information
+
+### 📌 Recruitment Position Management
+- Create recruitment positions
+- Manage hiring quantity
+- Track recruitment progress
+- Manage job requirements
+
+### 🎤 Interview Management
+- Schedule interviews
+- Manage interview calendars
+- Track interview results
+- Assign interviewers
+
+### 📝 Candidate Evaluation
+- Evaluate candidates
+- Score interview criteria
+- Store interviewer comments
+- Recommend recruitment decisions
+
+### 👥 Employee Management
+- Manage employee accounts
+- User authorization
+- Manage departments and roles
+
+### 📊 Statistics & Reports
+- Candidate statistics
+- Recruitment performance reports
+- Recruitment source analysis
+- Interactive dashboard visualization
+
+### 🔐 Authentication & Authorization
+- Login / Logout
+- Forgot Password
+- Role-Based Access Control
+- Admin / HR / Interviewer permissions
+
+---
+
+## 🛠 Technologies Used
+
+### Backend
 - ASP.NET Core MVC
 - Entity Framework Core
-- SQL Server
+- LINQ
+- Dependency Injection
+
+### Frontend
+- HTML5
+- CSS3
 - Bootstrap 5
 - JavaScript
+- jQuery
+
+### Database
+- SQL Server
+
+### Visualization
 - Chart.js
 
----
-
-# 📷 Giao Diện Hệ Thống
-
-## 🔐 Trang Đăng Nhập
-
-![Trang Đăng Nhập](Nhom6_QLHoSoTuyenDung/screenshots/login.png)
-
-Trang xác thực người dùng và phân quyền truy cập hệ thống.
+### Version Control
+- Git
+- GitHub
 
 ---
 
-## 📊 Dashboard Quản Trị (Admin)
+## 🗄 Database Overview
+
+Main entities:
+
+- NguoiDung
+- NhanVien
+- UngVien
+- ViTriTuyenDung
+- LichPhongVan
+- DanhGiaPhongVan
+- PhongBan
+- VaiTro
+
+The system uses a relational database model to manage recruitment and employee information.
+
+---
+
+# 📷 System Screenshots
+
+## 🔐 Login Page
+
+![Login](Nhom6_QLHoSoTuyenDung/screenshots/login.png)
+
+User authentication and authorization page.
+
+---
+
+## 📊 Admin Dashboard
 
 ![Admin Dashboard](Nhom6_QLHoSoTuyenDung/screenshots/admin-dashboard.png)
 
-Hiển thị tổng quan:
+Features:
 
-- Tổng số hồ sơ
-- Ứng viên mới
-- Trạng thái tuyển dụng
-- Thống kê biểu đồ
-
----
-
-## 👨‍💼 Quản Lý Ứng Viên
-
-![Candidate Management](Nhom6_QLHoSoTuyenDung/screenshots/employee-management.png)
-
-Chức năng:
-
-- Thêm ứng viên
-- Cập nhật thông tin
-- Tìm kiếm
-- Theo dõi trạng thái tuyển dụng
+- Overview statistics
+- Candidate tracking
+- Recruitment status monitoring
+- Dashboard charts and analytics
 
 ---
 
-## 📌 Quản Lý Vị Trí Tuyển Dụng
+## 👨‍💼 Candidate Management
+
+![Candidate Management](Nhom6_QLHoSoTuyenDung/screenshots/candidate-management.png)
+
+Features:
+
+- Add candidate
+- Edit information
+- Search and filter
+- Recruitment status tracking
+
+---
+
+## 📌 Recruitment Position Management
 
 ![Recruitment Positions](Nhom6_QLHoSoTuyenDung/screenshots/recruitment-positions.png)
 
-Chức năng:
+Features:
 
-- Tạo vị trí tuyển dụng
-- Quản lý số lượng tuyển
-- Theo dõi trạng thái vị trí
+- Create positions
+- Manage hiring quantity
+- Track recruitment progress
 
 ---
 
-## 🎤 Quản Lý Phỏng Vấn
+## 🎤 Interview Management
 
 ![Interview Management](Nhom6_QLHoSoTuyenDung/screenshots/interview-management.png)
 
-Chức năng:
+Features:
 
-- Lên lịch phỏng vấn
-- Cập nhật trạng thái
-- Theo dõi kết quả phỏng vấn
+- Schedule interviews
+- Manage interview results
+- Track interview activities
 
 ---
 
-## ⏳ Danh Sách Chờ HR
+## ⏳ HR Waiting List
 
 ![HR Waiting List](Nhom6_QLHoSoTuyenDung/screenshots/hr-waiting-list.png)
 
-Hiển thị các ứng viên đang chờ xử lý hoặc phê duyệt.
+Displays candidates waiting for HR review or approval.
 
 ---
 
-## 👥 Quản Lý Nhân Viên
+## 👥 Employee Management
 
 ![Employee Management](Nhom6_QLHoSoTuyenDung/screenshots/employee-management.png)
 
-Chức năng:
+Features:
 
-- Quản lý tài khoản nhân viên
-- Phân quyền hệ thống
-- Cập nhật thông tin nhân sự
+- Employee account management
+- Role management
+- Department management
 
 ---
 
-## 📈 Thống Kê Và Báo Cáo
+## 📈 Reports & Analytics
 
 ![Reports](Nhom6_QLHoSoTuyenDung/screenshots/reports.png)
 
-Biểu đồ và báo cáo:
+Statistics:
 
-- Hiệu suất tuyển dụng
-- Nguồn ứng viên
-- Tỷ lệ chuyển đổi
+- Recruitment efficiency
+- Candidate sources
+- Conversion rate
+- Recruitment reports
 
 ---
 
-## 🎯 Dashboard Người Phỏng Vấn
+## 🎯 Interviewer Dashboard
 
 ![Interviewer Dashboard](Nhom6_QLHoSoTuyenDung/screenshots/interviewer-dashboard.png)
 
-Giao diện dành cho người phỏng vấn:
+Features:
 
-- Xem lịch phỏng vấn
-- Đánh giá ứng viên
-- Theo dõi kết quả
+- View interview schedules
+- Evaluate candidates
+- Monitor interview outcomes
 
+---
+
+## 🔐 User Roles
+
+### 👑 Admin
+- Manage entire system
+- Manage employees
+- View reports and statistics
+
+### 👨‍💼 HR
+- Manage candidates
+- Manage recruitment positions
+- Schedule interviews
+
+### 🎤 Interviewer
+- View assigned interviews
+- Evaluate candidates
+- Submit interview results
+
+---
+
+## ⚙️ Installation
+
+### Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/QuanLyHSTD.git
+```
+
+### Restore Packages
+
+```bash
+dotnet restore
+```
+
+### Update Database
+
+```powershell
+Update-Database
+```
+
+### Run Project
+
+```bash
+dotnet run
+```
+
+---
+
+## 📚 Learning Outcomes
+
+Through this project, the team practiced:
+
+- ASP.NET Core MVC Architecture
+- Entity Framework Core
+- Authentication & Authorization
+- Database Design
+- Dashboard Development
+- Data Visualization with Chart.js
+- Team Collaboration using Git & GitHub
+
+---
+
+## 👨‍💻 Author
+
+CyberFortis Recruitment Management Team
+
+Graduation Project – Information Technology
